@@ -1,0 +1,403 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #1b1f3b 0%, #0c101f 45%, #05060f 100%);
+  color: #f5f8ff;
+  min-height: 100%;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.battle-wrapper {
+  width: 100%;
+  max-width: 1080px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.module-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.title-block h1 {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: #9fb4ff;
+}
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.control-button {
+  padding: 0.65rem 1.4rem;
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: linear-gradient(135deg, #23a6d5 0%, #23d5ab 100%);
+  color: #0b1024;
+}
+
+.control-button.secondary {
+  background: linear-gradient(135deg, #8f94fb 0%, #4e54c8 100%);
+  color: #f0f4ff;
+  opacity: 0.8;
+}
+
+.control-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.control-button:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(35, 166, 213, 0.35);
+}
+
+.arena {
+  position: relative;
+  display: grid;
+  gap: 1rem;
+}
+
+.hud-layer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.hud-panel {
+  position: relative;
+  flex: 1 1 460px;
+  max-width: 665px;
+  display: flex;
+  justify-content: center;
+  filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.45));
+}
+
+.player-hud {
+  max-width: 520px;
+}
+
+.hud-bg {
+  width: 100%;
+  height: auto;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.hud-content {
+  position: absolute;
+  inset: 18% 12% 20% 11%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: #1f2344;
+}
+
+.player-hud .hud-content {
+  inset: 16% 12% 18% 12%;
+  color: #20263e;
+}
+
+.hud-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.hud-heading-left {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hud-icon {
+  width: 28px;
+  height: 28px;
+  image-rendering: pixelated;
+}
+
+.hud-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #37467a;
+}
+
+.hud-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #132550;
+  text-shadow: none;
+}
+
+.spec-grid {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.spec-grid li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(24, 35, 82, 0.85);
+  border-radius: 14px;
+  padding: 0.45rem 0.65rem;
+  flex: 1 1 calc(50% - 0.5rem);
+  color: #f4f7ff;
+  border: 1px solid rgba(79, 110, 191, 0.65);
+  box-shadow: inset 0 0 6px rgba(7, 10, 24, 0.35);
+}
+
+.spec-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 245, 179, 0.95);
+  font-size: 0.7rem;
+}
+
+.taunt {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #1d2d5c;
+  font-style: italic;
+}
+
+.status-line {
+  margin-top: 0.85rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #1f2f5a;
+}
+
+.player-stats {
+  margin-top: 0.35rem;
+}
+
+.stage-layer {
+  position: relative;
+  background: linear-gradient(180deg, rgba(16, 24, 54, 0.85) 0%, rgba(4, 6, 14, 0.95) 92%);
+  border-radius: 22px;
+  padding: 1rem;
+  box-shadow: inset 0 0 0 2px rgba(78, 110, 207, 0.35), 0 18px 52px rgba(0, 0, 0, 0.6);
+}
+
+.stage-layer::before {
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border-radius: 16px;
+  pointer-events: none;
+  background: radial-gradient(circle at top, rgba(57, 83, 162, 0.45) 0%, rgba(15, 20, 42, 0.6) 55%, rgba(4, 6, 14, 0.95) 100%);
+  filter: blur(2px);
+  z-index: 0;
+}
+
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 18px;
+  overflow: hidden;
+  background: radial-gradient(circle at top, #132349 0%, #0a152f 42%, #01040b 100%);
+  box-shadow: inset 0 0 0 2px rgba(25, 38, 89, 0.35);
+  z-index: 1;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.flash-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 70%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease-out;
+}
+
+.flash-overlay.active {
+  opacity: 0.8;
+}
+
+.hit-indicator {
+  position: absolute;
+  width: 30%;
+  aspect-ratio: 4 / 3;
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.hit-indicator.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+.hit-indicator.enemy-hit {
+  top: 38%;
+  left: 72%;
+  background-image: url("Art/Sprites/UI/_0000s_0001s_0003_Direct-hit-landed.-Main.png");
+}
+
+.hit-indicator.player-hit {
+  top: 52%;
+  left: 30%;
+  background-image: url("Art/Sprites/UI/_0000s_0001s_0000_Received-direct-hit-main.png");
+}
+
+.hit-indicator.miss {
+  background-image: url("Art/Sprites/UI/_0000s_0009_Miss.png");
+}
+
+.give-up-banner,
+.result-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40%;
+  aspect-ratio: 5 / 2;
+  background-repeat: no-repeat;
+  background-size: contain;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.give-up-banner.show,
+.result-banner.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.08);
+}
+
+.give-up-banner {
+  background-image: url("Art/Sprites/UI/_0000s_0008_Give-up.png");
+}
+
+.result-banner.win {
+  background-image: url("Art/Sprites/UI/_0000s_0003_You-win.png");
+}
+
+.result-banner.lose {
+  background-image: url("Art/Sprites/UI/_0000s_0007_Loss.png");
+}
+
+.canvas-wrapper.shake {
+  animation: shake 380ms ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-8px, -6px, 0); }
+  40% { transform: translate3d(6px, 8px, 0); }
+  60% { transform: translate3d(-6px, 4px, 0); }
+  80% { transform: translate3d(4px, -8px, 0); }
+}
+
+.log-panel {
+  background: rgba(10, 15, 40, 0.65);
+  border-radius: 18px;
+  padding: 1.25rem;
+  box-shadow: inset 0 0 0 1px rgba(90, 120, 255, 0.25);
+}
+
+.log-panel h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #9fb4ff;
+}
+
+.log-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.45rem;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.log-list li {
+  font-size: 0.85rem;
+  color: #d7e3ff;
+  background: rgba(25, 35, 80, 0.45);
+  padding: 0.45rem 0.6rem;
+  border-radius: 12px;
+  border: 1px solid rgba(76, 114, 255, 0.25);
+  list-style-position: inside;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 0.75rem;
+  }
+
+  .controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .canvas-wrapper {
+    border-radius: 14px;
+  }
+
+  .hud-panel {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .hud-content,
+  .player-hud .hud-content {
+    inset: 20% 16% 18% 16%;
+  }
+}

@@ -1,9 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dir /b /s \"Q:\\FakeDesktop\\file\\create\\Project_BotPop\\AiTrainer\")",
-      "Bash(findstr:*)",
-      "Bash(touch:*)"
+      "Bash(dir /b \"Q:\\FakeDesktop\\file\\create\\Project_BotPop\\AiTrainer\\Docs\\Reports\\living_ledger\")"
     ],
     "deny": [],
     "ask": []
