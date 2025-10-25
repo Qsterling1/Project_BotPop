@@ -2,6 +2,166 @@
 
 ---
 
+# Ledger Entry — October 25, 2025 — 3:15 PM (Pacific Daylight Time)
+
+**Name:** Claude (AI Assistant via Claude Code)
+**Date:** October 25, 2025
+**Time:** 3:15 PM PDT
+**Role:** Development Assistant
+**General Subject Matter:** WebGame code annotation completion - comprehensive ADJUST markers added throughout codebase for user customization.
+
+---
+
+## Summary
+Completed comprehensive code annotation of all rendering functions in main.js. Added ~80 `// ADJUST:` comments across 5 major sections to enable user to independently tweak positions, colors, sizes, and layout without assistance.
+
+---
+
+## Details
+
+### Continuation Context
+This session continued from previous work where:
+- WebGame v3.0 was fully functional (game starts, characters visible, interface working)
+- User requested code annotations instead of AI making positioning tweaks
+- User's quote: "It'll be difficult for you to tweak all these things over and over so you can just clearly explain to me in the code and where in the code to annotate the and change the locations myself."
+
+### Sections Annotated
+
+**1. Hit/Miss Animation System (Lines 629-662):**
+- Animation sprite size (scale multiplier)
+- X/Y positioning (centered horizontally by default)
+- Animation duration in frames (60 frames = 1 second at 60fps)
+
+**2. Move Selection Side Panel (Lines 730-804):**
+- Panel width (500px) and anchoring (right edge)
+- Background color (rgba), border color, border thickness
+- Move button dimensions (460x90) and vertical spacing (15px)
+- Move text positioning (name, slot, description)
+- Stat display positioning (DMG, HEAT, ACC)
+- Back button (anchored bottom of panel)
+
+**3. Post-Battle Result Screen (Lines 806-860):**
+- Background overlay color and opacity
+- Result sprite size (1.5x scale) and Y position (80px from top)
+- Battle summary title positioning
+- Reward text positioning (Data Packets, XP, PMP, Parts)
+- Line spacing between reward items (40px)
+- Integrity status line
+- Return prompt (anchored bottom, 60px from edge)
+
+**4. Challenge Acceptance Screen (Lines 349-412):**
+- Overlay darkness (rgba(0, 0, 0, 0.85))
+- Challenge text positioning:
+  - "YOU HAVE BEEN CHALLENGED!" (y:200, size:24)
+  - Enemy name (y:280, size:18)
+  - "DO YOU ACCEPT?" (y:350, size:20)
+- "Bring it on!" button (left side):
+  - Dimensions (300x60)
+  - Position (offset from center)
+  - Colors (fill, border)
+- "Not right now" button (right side)
+  - Same structure as accept button
+
+**5. Main Menu Screen (Lines 414-459):**
+- Play button (ANCHORED BOTTOM-RIGHT):
+  - Scale (1.2x)
+  - Distance from right edge (120px)
+  - Distance from bottom edge (120px)
+- Back button (ANCHORED TOP-LEFT):
+  - Dimensions (200x40)
+  - Distance from left edge (30px)
+  - Distance from top edge (30px)
+  - Colors and border styling
+
+### Annotation Format Standards
+
+**Section Headers:**
+```javascript
+// ============================================================================
+// SECTION NAME - ANCHOR DESCRIPTION
+// ============================================================================
+```
+
+**Adjustable Values:**
+```javascript
+const panelX = 10;                                               // ADJUST: Distance from left edge
+const panelY = 10;                                               // ADJUST: Distance from top edge
+const panelW = 300;                                              // ADJUST: Panel width
+ctx.fillStyle = 'rgba(78, 205, 196, 0.8)';                      // ADJUST: Panel background color (R, G, B, opacity)
+```
+
+**Text Rendering:**
+```javascript
+drawPixelText('TITLE', x, y, 22, '#4ECDC4', 'center', true);    // ADJUST: Title position & size & color
+```
+
+### Anchor System Implementation
+
+All UI elements now documented with anchor points:
+- **ANCHORED TOP-LEFT:** Player stat panel, back button (menu)
+- **ANCHORED TOP-RIGHT:** Enemy stat panel
+- **ANCHORED BOTTOM:** Command interface (full width)
+- **ANCHORED BOTTOM-LEFT:** Tabia character
+- **ANCHORED BOTTOM-RIGHT:** Play button (menu)
+- **ANCHORED BOTTOM-CENTER-LEFT:** Player bot (MarqueeBot)
+- **ANCHORED BOTTOM-CENTER-RIGHT:** Enemy bot
+- **ANCHORED RIGHT:** Move selection side panel (full height)
+
+### User Benefits
+
+**Search Capability:**
+User can search for "ADJUST" in code to find all ~80 customizable parameters.
+
+**Self-Service Adjustments:**
+User can now independently modify:
+- Character positions and sizes
+- UI panel positions and dimensions
+- Text sizes and colors
+- Button layouts and spacing
+- Border colors and thicknesses
+- Background colors and opacities
+- Animation timings and sizes
+- All RGBA color values
+
+**Documentation:**
+Each adjustment includes:
+- What the value controls
+- Units (pixels, scale multipliers, percentages, RGBA)
+- Current value with context
+- Positioning anchor point
+
+---
+
+## Roadblocks
+None encountered.
+
+---
+
+## Potential Problems
+None identified. All code annotations complete and ready for user testing.
+
+---
+
+## Projections / Next Steps
+1. **User will adjust positions** using ADJUST markers
+2. **Pending task (not started):** Move WebGame to root directory for GitHub Pages deployment
+   - User mentioned requirement but work hasn't started
+   - Should wait until user finishes positioning adjustments
+
+---
+
+## Technical Statistics
+- **Annotations added:** ~80 ADJUST comments
+- **Sections annotated:** 5 major rendering functions
+- **Total adjustable parameters:** Every position, size, color, and spacing value
+- **Line references:** All annotations include exact line numbers for easy navigation
+
+---
+
+**End of Entry**
+
+---
+
 # Ledger Entry — October 25, 2025 — 12:30 PM (Pacific Daylight Time)
 
 **Name:** Claude (AI Assistant via Claude Code)
