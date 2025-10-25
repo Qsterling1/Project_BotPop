@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /b /s \"Q:\\FakeDesktop\\file\\create\\Project_BotPop\\AiTrainer\")",
+      "Bash(findstr:*)",
+      "Bash(touch:*)",
+      "Bash(dir /b \"Q:\\FakeDesktop\\file\\create\\Project_BotPop\\AiTrainer\\WebGame\\Audio\")",
+      "Bash(python -m http.server:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

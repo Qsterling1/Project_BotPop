@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -254,6 +254,28 @@
             box-shadow: 0 10px 35px var(--shadow-hover),
                         0 0 30px rgba(78, 205, 196, 0.5);
             background: linear-gradient(135deg, var(--accent-teal-dark) 0%, var(--accent-teal) 100%);
+        }
+
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        button.cta-button {
+            border: 4px solid var(--border-gold);
+            font-family: 'Righteous', 'Poppins', sans-serif;
+        }
+
+        .cta-button.warmup-launch {
+            background: linear-gradient(135deg, var(--accent-coral) 0%, #ff8e53 100%);
+        }
+
+        .cta-button.warmup-launch:hover {
+            background: linear-gradient(135deg, #ff8e53 0%, var(--accent-coral) 100%);
         }
 
         /* Section Styling */
@@ -640,10 +662,10 @@
     <!-- Accessibility Controls -->
     <div class="accessibility-controls">
         <button class="accessibility-btn" id="themeToggle" aria-label="Toggle dark mode">
-            <span id="themeIcon">🌙</span> Dark Mode
+            <span id="themeIcon">ðŸŒ™</span> Dark Mode
         </button>
         <button class="accessibility-btn" id="dyslexicToggle" aria-label="Toggle dyslexia-friendly font">
-            <span>📖</span> Dyslexia Mode
+            <span>ðŸ“–</span> Dyslexia Mode
         </button>
     </div>
 
@@ -669,7 +691,10 @@
             <img src="AiTrainer/Art/Marketing/_0002_CoverArt.png" alt="AI Trainer - Tabia and Robots">
         </div>
         <h1 class="tagline">Explore. Tinker. Battle to become the ultimate AI Trainer.</h1>
-        <a href="#contact" class="cta-button">Join the Lab Updates</a>
+        <div class="hero-actions">
+            <a href="#contact" class="cta-button">Join the Lab Updates</a>
+            <button type="button" class="cta-button warmup-launch" onclick="window.open('./WebGame/index.html','_blank')">Warm-Up Battle</button>
+        </div>
     </section>
 
     <!-- About Section -->
@@ -711,7 +736,10 @@
     <section id="battle">
         <h2>Battle Your Robots</h2>
         <div class="battle-scene">
-            <img src="AiTrainer/Art/Reference images/BattleScene1.png" alt="Robot Battle Scene">
+            <a href="AiTrainer/WebGame/index.html" target="_blank" style="cursor: pointer; display: block;">
+                <img src="AiTrainer/Art/Reference images/BattleScene1.png" alt="Robot Battle Scene" style="width: 100%; border-radius: 15px; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 30px rgba(78, 205, 196, 0.5)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+            </a>
+            <p style="text-align: center; margin-top: 20px; color: #4ECDC4; font-size: 18px; font-weight: bold;">Click image to start Warm-Up Battle!</p>
         </div>
     </section>
 
@@ -740,8 +768,8 @@
         const currentTheme = localStorage.getItem('theme') || 'light';
         if (currentTheme === 'dark') {
             htmlElement.setAttribute('data-theme', 'dark');
-            themeIcon.textContent = '☀️';
-            themeToggle.innerHTML = '<span id="themeIcon">☀️</span> Light Mode';
+            themeIcon.textContent = 'â˜€ï¸';
+            themeToggle.innerHTML = '<span id="themeIcon">â˜€ï¸</span> Light Mode';
             themeToggle.classList.add('active');
         }
 
@@ -749,14 +777,14 @@
             const theme = htmlElement.getAttribute('data-theme');
             if (theme === 'dark') {
                 htmlElement.removeAttribute('data-theme');
-                themeIcon.textContent = '🌙';
-                themeToggle.innerHTML = '<span id="themeIcon">🌙</span> Dark Mode';
+                themeIcon.textContent = 'ðŸŒ™';
+                themeToggle.innerHTML = '<span id="themeIcon">ðŸŒ™</span> Dark Mode';
                 themeToggle.classList.remove('active');
                 localStorage.setItem('theme', 'light');
             } else {
                 htmlElement.setAttribute('data-theme', 'dark');
-                themeIcon.textContent = '☀️';
-                themeToggle.innerHTML = '<span id="themeIcon">☀️</span> Light Mode';
+                themeIcon.textContent = 'â˜€ï¸';
+                themeToggle.innerHTML = '<span id="themeIcon">â˜€ï¸</span> Light Mode';
                 themeToggle.classList.add('active');
                 localStorage.setItem('theme', 'dark');
             }
@@ -796,3 +824,4 @@
     </script>
 </body>
 </html>
+
