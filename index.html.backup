@@ -878,7 +878,7 @@
         <h2>Battle Your Robots</h2>
         <div class="battle-scene">
             <a href="AiTrainer/WebGame/index.html" target="_blank" style="cursor: pointer; display: block;">
-                <img src="AiTrainer/WebGame/Art/Sprites/MockScences/Victory screenshot.png" alt="Robot Battle Scene" style="width: 100%; border-radius: 15px; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 30px rgba(78, 205, 196, 0.5)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
+                <img src="AiTrainer/Art/Reference images/BattleScene1.png" alt="Robot Battle Scene" style="width: 100%; border-radius: 15px; transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 30px rgba(78, 205, 196, 0.5)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
             </a>
             <p style="text-align: center; margin-top: 20px; color: #4ECDC4; font-size: 18px; font-weight: bold;">Click image to start Warm-Up Battle!</p>
         </div>
@@ -908,33 +908,27 @@
         const currentTheme = localStorage.getItem('theme') || 'light';
         if (currentTheme === 'dark') {
             htmlElement.setAttribute('data-theme', 'dark');
+            themeIcon.textContent = 'â˜€ï¸';
+            themeToggle.innerHTML = '<span id="themeIcon">â˜€ï¸</span> Light Mode';
             themeToggle.classList.add('active');
-            themeToggle.setAttribute('aria-checked', 'true');
         }
 
         themeToggle.addEventListener('click', () => {
             const theme = htmlElement.getAttribute('data-theme');
             if (theme === 'dark') {
                 htmlElement.removeAttribute('data-theme');
+                themeIcon.textContent = 'ðŸŒ™';
+                themeToggle.innerHTML = '<span id="themeIcon">ðŸŒ™</span> Dark Mode';
                 themeToggle.classList.remove('active');
-                themeToggle.setAttribute('aria-checked', 'false');
                 localStorage.setItem('theme', 'light');
             } else {
                 htmlElement.setAttribute('data-theme', 'dark');
+                themeIcon.textContent = 'â˜€ï¸';
+                themeToggle.innerHTML = '<span id="themeIcon">â˜€ï¸</span> Light Mode';
                 themeToggle.classList.add('active');
-                themeToggle.setAttribute('aria-checked', 'true');
                 localStorage.setItem('theme', 'dark');
             }
         });
-
-        // Keyboard support for theme toggle
-        themeToggle.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                themeToggle.click();
-            }
-        });
-
 
         // Dyslexia Mode Toggle
         const dyslexicToggle = document.getElementById('dyslexicToggle');
@@ -945,23 +939,13 @@
         if (dyslexicMode) {
             bodyElement.classList.add('dyslexic-mode');
             dyslexicToggle.classList.add('active');
-            dyslexicToggle.setAttribute('aria-checked', 'true');
         }
 
         dyslexicToggle.addEventListener('click', () => {
             bodyElement.classList.toggle('dyslexic-mode');
             dyslexicToggle.classList.toggle('active');
             const isActive = bodyElement.classList.contains('dyslexic-mode');
-            dyslexicToggle.setAttribute('aria-checked', isActive ? 'true' : 'false');
             localStorage.setItem('dyslexicMode', isActive);
-        });
-
-        // Keyboard support for dyslexia toggle
-        dyslexicToggle.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                dyslexicToggle.click();
-            }
         });
 
         // Smooth scrolling for navigation links

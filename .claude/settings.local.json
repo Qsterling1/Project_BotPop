@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dir /b \"Q:\\FakeDesktop\\file\\create\\Project_BotPop\\AiTrainer\\Docs\\Reports\\living_ledger\")"
+      "Bash(dir /b \"Q:\\FakeDesktop\\file\\create\\Project_BotPop\\AiTrainer\\Docs\\Reports\\living_ledger\")",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []
