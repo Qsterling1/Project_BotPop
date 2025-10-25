@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Trainer - Explore. Tinker. Battle.</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #FFF8DC 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid #FFD700;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 60px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #2E4057;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #FF6B6B;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-banner {
+            margin-bottom: 2rem;
+        }
+
+        .hero-banner img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            color: #2E4057;
+            margin: 2rem 0 1rem;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            color: #2E4057;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            color: white;
+            padding: 1.2rem 3rem;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            border: 4px solid #fff;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Section Styling */
+        section {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 3px solid #FFD700;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            color: #FF6B6B;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        /* About Section */
+        .about-content {
+            font-size: 1.2rem;
+            text-align: center;
+            color: #2E4057;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* Robots Grid */
+        .robots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .robot-card {
+            background: linear-gradient(135deg, #F8F9FA 0%, #E9ECEF 100%);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 3px solid #4ECDC4;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .robot-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .robot-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .robot-card h3 {
+            color: #2E4057;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .robot-card p {
+            color: #555;
+            font-size: 1rem;
+        }
+
+        /* Battle Scene Section */
+        .battle-scene {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .battle-scene img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Dev Log Section */
+        .devlog-content {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #2E4057;
+            padding: 2rem;
+            background: linear-gradient(135deg, #FFE66D 0%, #FFAB73 100%);
+            border-radius: 15px;
+            margin-top: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(46, 64, 87, 0.95);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-top: 4px solid #FFD700;
+        }
+
+        .footer-logo {
+            height: 50px;
+            margin-bottom: 1rem;
+        }
+
+        footer a {
+            color: #4ECDC4;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer a:hover {
+            color: #FFE66D;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 1.2rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <img src="../../Art/Marketing/_0000_Logo.png" alt="AI Trainer Logo" class="logo">
+            <nav>
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#robots">Robots</a></li>
+                    <li><a href="#battle">Battle</a></li>
+                    <li><a href="#devlog">Dev Log</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-banner">
+            <img src="../../Art/Marketing/_0002_CoverArt.png" alt="AI Trainer - Tabia and Robots">
+        </div>
+        <h1 class="tagline">Explore. Tinker. Battle to become the ultimate AI Trainer.</h1>
+        <a href="#contact" class="cta-button">Join the Lab Updates</a>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <h2>About AI Trainer</h2>
+        <div class="about-content">
+            <p>AI Trainer is a collectible adventure where you explore the world, gather computer parts, and build robots to compete and learn through play. Play as a young aspiring engineer with more ideas than resources. Build, repair, and refine your own machines that learn from failure and grow stronger through experience.</p>
+        </div>
+    </section>
+
+    <!-- Robots Section -->
+    <section id="robots">
+        <h2>Meet Your Robots</h2>
+        <div class="robots-grid">
+            <div class="robot-card">
+                <img src="../../Art/Reference images/Marquee-level1.png" alt="Level 1 Robot">
+                <h3>Level 1: Scrap Starter</h3>
+                <p>Built from scrap. Born to compete.</p>
+            </div>
+            <div class="robot-card">
+                <img src="../../Art/Reference images/Marquee-level2.png" alt="Level 2 Robot">
+                <h3>Level 2: Circuit Fighter</h3>
+                <p>Getting stronger. Learning faster.</p>
+            </div>
+            <div class="robot-card">
+                <img src="../../Art/Reference images/Marquee-level3.png" alt="Level 3 Robot">
+                <h3>Level 3: Tech Warrior</h3>
+                <p>Upgraded parts. Advanced logic.</p>
+            </div>
+            <div class="robot-card">
+                <img src="../../Art/Reference images/Marquee-level4.png" alt="Level 4 Robot">
+                <h3>Level 4: Elite Champion</h3>
+                <p>Peak performance. Legendary power.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Battle Section -->
+    <section id="battle">
+        <h2>Battle Your Robots</h2>
+        <div class="battle-scene">
+            <img src="../../Art/Reference images/BattleScene1.png" alt="Robot Battle Scene">
+        </div>
+    </section>
+
+    <!-- Dev Log Section -->
+    <section id="devlog">
+        <h2>Development Log</h2>
+        <div class="devlog-content">
+            <p>Currently in development. Follow updates as new builds and features roll out.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <img src="../../Art/Marketing/7thLifeStudios_Logo.png" alt="7th Life Studios Logo" class="footer-logo">
+        <p><a href="mailto:contact@7thlifestudios.com">Contact</a></p>
+        <p>7thLifeStudios &copy; 2025 AI Trainer Project</p>
+    </footer>
+</body>
+</html>
