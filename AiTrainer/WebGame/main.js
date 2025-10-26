@@ -336,10 +336,10 @@ function drawPixelText(text, x, y, size, color, align = 'left', bold = false) {
 
     // Add thick black outline for readability
     ctx.strokeStyle = '#000000';
-    ctx.lineWidth = Math.max(3, size / 4);
-    ctx.lineJoin = 'round';
-    ctx.miterLimit = 2;
-    ctx.strokeText(text, x, y);
+   // ctx.lineWidth = Math.max(3, size / 4);
+   // ctx.lineJoin = 'round';
+   // ctx.miterLimit = 0;
+    ctx.strokeText(text, x, y);//
 
     // Fill with color
     ctx.fillStyle = color;
@@ -360,53 +360,53 @@ function drawChallengeScreen() {
     }
 
     // Semi-transparent overlay
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';                             // ADJUST: Overlay darkness (R, G, B, opacity)
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.29)';                             // ADJUST: Overlay darkness (R, G, B, opacity)
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // ============================================================================
     // CHALLENGE TEXT
     // ============================================================================
-    drawPixelText('YOU HAVE BEEN CHALLENGED!', canvas.width / 2, 300, 36, '#FF6B6B', 'center', true);  // ADJUST: Main title position & size & color
+    drawPixelText('YOU HAVE BEEN CHALLENGED!', canvas.width / 2, 250, 20, '#ffffffff', 'center', true);  // ADJUST: Main title position & size & color
 
     if (gameState.challengeEnemy) {
-        drawPixelText(`${gameState.challengeEnemy.name} wants to battle!`, canvas.width / 2, 420, 27, '#FFD700', 'center', false);  // ADJUST: Enemy name position & size & color
+        drawPixelText(`${gameState.challengeEnemy.name} wants to battle!`, canvas.width / 2, 300, 20, '#fd0303ff', 'center', false);  // ADJUST: Enemy name position & size & color
     }
 
-    drawPixelText('DO YOU ACCEPT?', canvas.width / 2, 525, 30, '#FFFFFF', 'center', true);  // ADJUST: Prompt position & size & color
+    drawPixelText('DO YOU ACCEPT?', canvas.width / 2, 350, 20, '#FFFFFF', 'center', true);  // ADJUST: Prompt position & size & color
 
     // ============================================================================
     // "BRING IT ON!" BUTTON (ACCEPT) - LEFT SIDE
     // ============================================================================
-    const acceptBtnW = 300;                                            // ADJUST: Accept button width
-    const acceptBtnH = 60;                                             // ADJUST: Accept button height
+    const acceptBtnW = 310;                                            // ADJUST: Accept button width
+    const acceptBtnH = 70;                                             // ADJUST: Accept button height
     const acceptBtnX = canvas.width / 2 - acceptBtnW - 20;             // ADJUST: Left button position (offset from center)
-    const acceptBtnY = 420;                                            // ADJUST: Button Y position from top
+    const acceptBtnY = 520;                                            // ADJUST: Button Y position from top
 
-    ctx.fillStyle = 'rgba(78, 205, 196, 0.8)';                         // ADJUST: Accept button fill color
+    ctx.fillStyle = 'rgba(71, 255, 64, 0.8)';                         // ADJUST: Accept button fill color
     ctx.fillRect(acceptBtnX, acceptBtnY, acceptBtnW, acceptBtnH);
-    ctx.strokeStyle = '#4ECDC4';                                       // ADJUST: Accept button border color
-    ctx.lineWidth = 4;                                                 // ADJUST: Accept button border thickness
+   ctx.strokeStyle = '#ffffffff';                                       // ADJUST: Accept button border color
+   ctx.lineWidth = 3;                                                 // ADJUST: Accept button border thickness
     ctx.strokeRect(acceptBtnX, acceptBtnY, acceptBtnW, acceptBtnH);
 
-    drawPixelText('BRING IT ON!', acceptBtnX + acceptBtnW / 2, acceptBtnY + 40, 36, '#FFFFFF', 'center', true);  // ADJUST: Button text
+    drawPixelText('BRING IT ON!', acceptBtnX + acceptBtnW / 2, acceptBtnY + 40, 20, '#FFFFFF', 'center', true);  // ADJUST: Button text
 
     gameState.acceptButtonBounds = { x: acceptBtnX, y: acceptBtnY, w: acceptBtnW, h: acceptBtnH };
 
     // ============================================================================
     // "NOT RIGHT NOW" BUTTON (DECLINE) - RIGHT SIDE
     // ============================================================================
-    const declineBtnW = 300;                                           // ADJUST: Decline button width
-    const declineBtnH = 60;                                            // ADJUST: Decline button height
+    const declineBtnW = 310;                                           // ADJUST: Decline button width
+    const declineBtnH = 70;                                            // ADJUST: Decline button height
     const declineBtnX = canvas.width / 2 + 20;                         // ADJUST: Right button position (offset from center)
-    const declineBtnY = 420;                                           // ADJUST: Button Y position from top
+    const declineBtnY = 520;                                           // ADJUST: Button Y position from top
 
     ctx.fillStyle = 'rgba(255, 107, 107, 0.6)';                        // ADJUST: Decline button fill color
     ctx.fillRect(declineBtnX, declineBtnY, declineBtnW, declineBtnH);
-    ctx.strokeStyle = '#FF6B6B';                                       // ADJUST: Decline button border color
-    ctx.lineWidth = 4;                                                 // ADJUST: Decline button border thickness
+   ctx.strokeStyle = '#ffffffff';                                       // ADJUST: Decline button border color
+   ctx.lineWidth = 3;                                                 // ADJUST: Decline button border thickness
     ctx.strokeRect(declineBtnX, declineBtnY, declineBtnW, declineBtnH);
 
-    drawPixelText('NOT RIGHT NOW', declineBtnX + declineBtnW / 2, declineBtnY + 40, 36, '#FFFFFF', 'center', true);  // ADJUST: Button text
+    drawPixelText('NOT RIGHT NOW', declineBtnX + declineBtnW / 2, declineBtnY + 40, 20, '#FFFFFF', 'center', true);  // ADJUST: Button text
 
     gameState.declineButtonBounds = { x: declineBtnX, y: declineBtnY, w: declineBtnW, h: declineBtnH };
 }
@@ -416,7 +416,7 @@ function drawChallengeScreen() {
 // ============================================================================
 function drawMainMenu() {
     // Background
-    ctx.fillStyle = '#000';                                            // ADJUST: Base background color (if no image)
+    ctx.fillStyle = '#aaaaaaff';                                            // ADJUST: Base background color (if no image)
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const menuImg = gameState.images[ASSETS.menu];
@@ -432,8 +432,8 @@ function drawMainMenu() {
         const btnScale = 1.2;                                          // ADJUST: Play button size (1.2 = 120% of original)
         const btnW = playBtn.width * btnScale;
         const btnH = playBtn.height * btnScale;
-        const btnX = canvas.width - btnW - 120;                        // ADJUST: Distance from right edge
-        const btnY = canvas.height - btnH - 120;                       // ADJUST: Distance from bottom edge
+        const btnX = canvas.width - btnW - 220;                        // ADJUST: Distance from right edge
+        const btnY = canvas.height - btnH - 220;                       // ADJUST: Distance from bottom edge
 
         ctx.drawImage(playBtn, btnX, btnY, btnW, btnH);
         gameState.playButtonBounds = { x: btnX, y: btnY, w: btnW, h: btnH };
@@ -476,20 +476,20 @@ function drawBattle() {
     // ============================================================================
     // DEBUG INFO (can remove or hide later)
     // ============================================================================
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    ctx.fillRect(10, canvas.height - 60, 500, 55);
-    ctx.fillStyle = '#00FF00';
-    ctx.font = '12px monospace';
-    ctx.fillText(`Scene: ${gameState.scene} | SlideComplete: ${battle.slideComplete}`, 15, canvas.height - 45);
-    ctx.fillText(`PlayerBotX: ${battle.playerBotX} | EnemyBotX: ${battle.enemyBotX}`, 15, canvas.height - 30);
-    ctx.fillText(`Target: PlayerX >= 450, EnemyX <= 850`, 15, canvas.height - 15);
+   // ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    //ctx.fillRect(10, canvas.height - 60, 500, 55);
+   // ctx.fillStyle = '#00FF00';
+   // ctx.font = '12px monospace';
+   // ctx.fillText(`Scene: ${gameState.scene} | SlideComplete: ${battle.slideComplete}`, 15, canvas.height - 45);
+   // ctx.fillText(`PlayerBotX: ${battle.playerBotX} | EnemyBotX: ${battle.enemyBotX}`, 15, canvas.height - 30);
+   // ctx.fillText(`Target: PlayerX >= 450, EnemyX <= 850`, 15, canvas.height - 15);
 
     // ============================================================================
     // CHARACTER POSITIONS (ADJUST HERE)
     // ============================================================================
     // These values control where bots appear on screen
     const playerBotX = battle.slideComplete ? 450 : battle.playerBotX;  // ADJUST: Player bot X position (450 = final position)
-    const enemyBotX = battle.slideComplete ? 850 : battle.enemyBotX;    // ADJUST: Enemy bot X position (850 = final position)
+    const enemyBotX = battle.slideComplete ? 650 : battle.enemyBotX;    // ADJUST: Enemy bot X position (850 = final position)
 
     // ============================================================================
     // TABIA (Player Character) - ANCHORED BOTTOM-LEFT
@@ -499,8 +499,8 @@ function drawBattle() {
         const tabiaScale = 0.5;                                        // ADJUST: Tabia size (0.5 = 50% of original)
         const tabiaW = tabiaImg.width * tabiaScale;
         const tabiaH = tabiaImg.height * tabiaScale;
-        const tabiaX = 200;                                            // ADJUST: Tabia X position from left edge
-        const tabiaY = canvas.height - tabiaH - 80;                    // ADJUST: -80 = distance from bottom
+        const tabiaX = 100;                                            // ADJUST: Tabia X position from left edge
+        const tabiaY = canvas.height - tabiaH - 10;                    // ADJUST: -80 = distance from bottom
         ctx.drawImage(tabiaImg, tabiaX, tabiaY, tabiaW, tabiaH);
     }
 
@@ -509,10 +509,10 @@ function drawBattle() {
     // ============================================================================
     const botImg = gameState.images[battle.playerSprites.bot];
     if (botImg) {
-        const botScale = 0.35;                                         // ADJUST: Bot size (0.35 = 35% of original)
+        const botScale = 0.30;                                         // ADJUST: Bot size (0.35 = 35% of original)
         const botW = botImg.width * botScale;
         const botH = botImg.height * botScale;
-        const botY = canvas.height - botH - 80;                        // ADJUST: -80 = distance from bottom
+        const botY = canvas.height - botH - 65;                        // ADJUST: -80 = distance from bottom
         ctx.drawImage(botImg, playerBotX, botY, botW, botH);
     }
 
@@ -521,10 +521,10 @@ function drawBattle() {
     // ============================================================================
     const enemyImg = gameState.images[battle.enemySprite];
     if (enemyImg) {
-        const enemyScale = 0.4;                                        // ADJUST: Enemy size (0.4 = 40% of original)
+        const enemyScale = 0.5;                                        // ADJUST: Enemy size (0.4 = 40% of original)
         const enemyW = enemyImg.width * enemyScale;
         const enemyH = enemyImg.height * enemyScale;
-        const enemyY = canvas.height - enemyH - 200;                   // ADJUST: -200 = distance from bottom (higher than player)
+        const enemyY = canvas.height - enemyH - 250;                   // ADJUST: -200 = distance from bottom (higher than player)
         ctx.drawImage(enemyImg, enemyBotX, enemyY, enemyW, enemyH);
     }
 
@@ -554,8 +554,8 @@ function drawStatPanelsWithIcons() {
     if (topLeftBox) {
         const panelX = 10;                                             // ADJUST: Distance from left edge
         const panelY = 10;                                             // ADJUST: Distance from top edge
-        const panelW = 300;                                            // ADJUST: Panel width
-        const panelH = 160;                                            // ADJUST: Panel height
+        const panelW = 500;                                            // ADJUST: Panel width
+        const panelH = 300;                                            // ADJUST: Panel height
         ctx.drawImage(topLeftBox, panelX, panelY, panelW, panelH);
 
         // Player icon
@@ -685,14 +685,16 @@ function drawCommandInterface() {
     // ============================================================================
     // COMMAND INTERFACE PANEL - ANCHORED BOTTOM (FULL WIDTH)
     // ============================================================================
-    const panelHeight = 150;                                           // ADJUST: Panel height
+    const panelHeight = 300;                                           // ADJUST: Panel height
     const panelY = canvas.height - panelHeight;                        // Anchored to bottom
 
     // Background panel - Use light UI textbox sprite
     const commandPanelBox = gameState.images[ASSETS.uiBoxTopLeft];
     if (commandPanelBox) {
         // Draw the textbox sprite as background (light background)
-        ctx.drawImage(commandPanelBox, 0, panelY, canvas.width, panelHeight);
+      const panelWidth = 400; // adjust as needed
+ctx.drawImage(commandPanelBox, 875, panelY, panelWidth, panelHeight);
+
     } else {
         // Fallback to light color if sprite not loaded
         ctx.fillStyle = 'rgba(240, 240, 240, 0.95)';                  // ADJUST: Light panel background color
@@ -700,21 +702,21 @@ function drawCommandInterface() {
     }
 
     // Border
-    ctx.strokeStyle = '#4ECDC4';                                       // ADJUST: Panel border color
-    ctx.lineWidth = 3;                                                 // ADJUST: Border thickness
+   // ctx.strokeStyle = '#4ECDC4';                                       // ADJUST: Panel border color
+   // ctx.lineWidth = 3;                                                 // ADJUST: Border thickness
     ctx.strokeRect(0, panelY, canvas.width, panelHeight);
 
     // Title text - Now dark text on light background
-    drawPixelText('COMMAND INTERFACE', canvas.width / 2, panelY + 35, 49, '#2E4057', 'center', true);  // ADJUST: Title position & size & color (dark text)
+    drawPixelText('COMMAND INTERFACE', canvas.width / 10, panelY + 50, 10, '#00ff00ff', 'center', true);  // ADJUST: Title position & size & color (dark text)
 
     // ============================================================================
     // COMMAND BUTTONS LAYOUT
     // ============================================================================
-    const btnWidth = 250;                                              // ADJUST: Button width
-    const btnHeight = 50;                                              // ADJUST: Button height
+    const btnWidth = 200;                                              // ADJUST: Button width
+    const btnHeight = 40;                                              // ADJUST: Button height
     const btnSpacing = 25;                                             // ADJUST: Space between buttons
     const startX = (canvas.width - (btnWidth * 4 + btnSpacing * 3)) / 2;  // Auto-centered
-    const btnY = panelY + 70;                                          // ADJUST: Distance from panel top
+    const btnY = panelY + 20;                                          // ADJUST: Distance from panel top
 
     const commands = [
         { text: 'EXECUTE', enabled: true, key: 'execute' },            // ADJUST: Button text & enabled state
@@ -729,16 +731,16 @@ function drawCommandInterface() {
         const btnX = startX + (btnWidth + btnSpacing) * i;
 
         // Button background
-        ctx.fillStyle = cmd.enabled ? 'rgba(78, 205, 196, 0.5)' : 'rgba(100, 100, 100, 0.3)';  // ADJUST: Button fill colors (enabled/disabled)
+        ctx.fillStyle = cmd.enabled ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 0.3)';  // ADJUST: Button fill colors (enabled/disabled)
         ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
 
         // Button border
-        ctx.strokeStyle = cmd.enabled ? '#4ECDC4' : '#666';            // ADJUST: Button border colors (enabled/disabled)
-        ctx.lineWidth = 3;                                             // ADJUST: Button border thickness
-        ctx.strokeRect(btnX, btnY, btnWidth, btnHeight);
+        //ctx.strokeStyle = cmd.enabled ? '#f87373ff' : '#666';            // ADJUST: Button border colors (enabled/disabled)
+       //ctx.lineWidth = 3;                                             // ADJUST: Button border thickness
+        //ctx.strokeRect(btnX, btnY, btnWidth, btnHeight);
 
         // Button text - Dark text on light backgrounds
-        drawPixelText(cmd.text, btnX + btnWidth / 2, btnY + 33, 36, cmd.enabled ? '#2E4057' : '#999', 'center', true);  // ADJUST: Text position & size & colors (dark text)
+        drawPixelText(cmd.text, btnX + btnWidth / 2, btnY + 33, 20, cmd.enabled ? '#2E4057' : '#999', 'center', true);  // ADJUST: Text position & size & colors (dark text)
 
         if (cmd.enabled) {
             gameState.commandButtons.push({ key: cmd.key, x: btnX, y: btnY, w: btnWidth, h: btnHeight });
@@ -770,21 +772,21 @@ function drawMoveSelectionSidePanel() {
         ctx.fillRect(panelX, 0, panelWidth, canvas.height);
     }
 
-    ctx.strokeStyle = '#4ECDC4';                                       // ADJUST: Panel border color
-    ctx.lineWidth = 5;                                                 // ADJUST: Panel border thickness
+   // ctx.strokeStyle = '#ffffffff';                                       // ADJUST: Panel border color
+ //   ctx.lineWidth = -1;                                                 // ADJUST: Panel border thickness
     ctx.strokeRect(panelX, 0, panelWidth, canvas.height);
 
     // Panel title - Dark text on light background
-    drawPixelText('SELECT FUNCTION', panelX + panelWidth / 2, 67, 24, '#2E4057', 'center', true);  // ADJUST: Title position & size & color (dark text)
+    drawPixelText('SELECT FUNCTION', panelX + panelWidth / 2, 80, 24, '#ffffffff', 'center', true);  // ADJUST: Title position & size & color (dark text)
 
     // ============================================================================
     // MOVE BUTTONS LAYOUT
     // ============================================================================
     const moves = battle.player.moves;
     const btnWidth = 460;                                              // ADJUST: Move button width
-    const btnHeight = 90;                                              // ADJUST: Move button height
-    const startY = 90;                                                 // ADJUST: First button Y position from top
-    const spacing = 15;                                                // ADJUST: Vertical space between move buttons
+    const btnHeight = 120;                                              // ADJUST: Move button height
+    const startY = 100;                                                 // ADJUST: First button Y position from top
+    const spacing = 20;                                                // ADJUST: Vertical space between move buttons
 
     gameState.moveButtons = [];
 
@@ -793,21 +795,21 @@ function drawMoveSelectionSidePanel() {
         const btnY = startY + (btnHeight + spacing) * i;
 
         // Button background
-        ctx.fillStyle = 'rgba(78, 205, 196, 0.25)';                    // ADJUST: Move button fill color
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';                    // ADJUST: Move button fill color
         ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
-        ctx.strokeStyle = '#4ECDC4';                                   // ADJUST: Move button border color
+        ctx.strokeStyle = '#ffffffff';                                   // ADJUST: Move button border color
         ctx.lineWidth = 3;                                             // ADJUST: Move button border thickness
         ctx.strokeRect(btnX, btnY, btnWidth, btnHeight);
 
         // Move text (left side) - Darker colors for light background
-        drawPixelText(move.name, btnX + 15, btnY + 28, 31, '#D4AF37', 'left', true);              // ADJUST: Move name position & size & color (darker gold)
-        drawPixelText(`[${move.slot}]`, btnX + 15, btnY + 50, 19, '#666', 'left', false);          // ADJUST: Slot text position & size & color (darker gray)
-        drawPixelText(move.description, btnX + 15, btnY + 70, 19, '#555', 'left', false);          // ADJUST: Description position & size & color (darker gray)
+        drawPixelText(move.name, btnX + 15, btnY + 28, 31, '#ffffffff', 'left', true);              // ADJUST: Move name position & size & color (darker gold)
+        drawPixelText(`[${move.slot}]`, btnX + 15, btnY + 70, 19, '#fbff00ff', 'left', false);          // ADJUST: Slot text position & size & color (darker gray)
+        drawPixelText(move.description, btnX + 15, btnY + 110, 19, '#ffffffff', 'left', false);          // ADJUST: Description position & size & color (darker gray)
 
         // Move stats (right side) - Darker colors for light background
-        drawPixelText(`DMG:${move.compute}`, btnX + btnWidth - 15, btnY + 35, 22, '#CC0000', 'right', false);           // ADJUST: Damage stat (darker red)
-        drawPixelText(`HEAT:${move.heat > 0 ? '+' : ''}${move.heat}`, btnX + btnWidth - 15, btnY + 55, 22, '#CC6600', 'right', false);  // ADJUST: Heat stat (darker orange)
-        drawPixelText(`ACC:${move.accuracy}%`, btnX + btnWidth - 15, btnY + 75, 22, '#008B8B', 'right', false);         // ADJUST: Accuracy stat (darker teal)
+        drawPixelText(`DMG:${move.compute}`, btnX + btnWidth - 15, btnY + 35, 22, '#e9ff27ff', 'right', false);           // ADJUST: Damage stat (darker red)
+        drawPixelText(`HEAT:${move.heat > 0 ? '+' : ''}${move.heat}`, btnX + btnWidth - 15, btnY +70, 22, '#e9ff27ff', 'right', false);  // ADJUST: Heat stat (darker orange)
+        drawPixelText(`ACC:${move.accuracy}%`, btnX + btnWidth - 15, btnY + 100, 22, '#e9ff27ff', 'right', false);         // ADJUST: Accuracy stat (darker teal)
 
         gameState.moveButtons.push({ move: move, x: btnX, y: btnY, w: btnWidth, h: btnHeight });
     });
@@ -826,17 +828,96 @@ function drawMoveSelectionSidePanel() {
     ctx.lineWidth = 3;                                                 // ADJUST: Back button border thickness
     ctx.strokeRect(backBtnX, backBtnY, backBtnW, backBtnH);
 
-    drawPixelText('BACK', backBtnX + backBtnW / 2, backBtnY + 30, 28, '#2E4057', 'center', true);  // ADJUST: Back text position & size & color (dark text)
+    drawPixelText('BACK', backBtnX + backBtnW / 2, backBtnY + 30, 28, '#818181ff', 'center', true);  // ADJUST: Back text position & size & color (dark text)
 
     gameState.backButton = { x: backBtnX, y: backBtnY, w: backBtnW, h: backBtnH };
+}
+
+// ============================================================================
+// POST-BATTLE WITH VICTORY/DEFEAT ANIMATIONS
+// ============================================================================
+function drawPostBattleWithAnimations() {
+    const battle = gameState.battle;
+    if (!battle) return;
+
+    // Draw background
+    ctx.fillStyle = '#00000042';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const bg = gameState.images[gameState.currentBg];
+    if (bg) {
+        ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+    }
+
+    // Determine winner and set appropriate sprites
+    let winner;
+    if (battle.player.hits >= 9) {
+        winner = 'player';
+    } else if (battle.enemy.hits >= 9) {
+        winner = 'enemy';
+    } else {
+        winner = 'concede';
+    }
+
+    // Draw victory/defeat character animations
+    if (winner === 'player') {
+        // Player wins - show victory animations
+        // Tabia win pose (left side)
+        const tabiaWin = gameState.images[ASSETS.tabia.win];
+        if (tabiaWin) {
+            const scale = 0.6;
+            const w = tabiaWin.width * scale;
+            const h = tabiaWin.height * scale;
+            const x = 150;
+            const y = canvas.height - h - 50;
+            ctx.drawImage(tabiaWin, x, y, w, h);
+        }
+
+        // Bot victory pose (center-left)
+        const botVictory = gameState.images[ASSETS.bot.victory];
+        if (botVictory) {
+            const scale = 0.45;
+            const w = botVictory.width * scale;
+            const h = botVictory.height * scale;
+            const x = 400;
+            const y = canvas.height - h - 50;
+            ctx.drawImage(botVictory, x, y, w, h);
+        }
+    } else if (winner === 'enemy') {
+        // Enemy wins - show defeat animations
+        // Tabia loss pose (left side)
+        const tabiaLoss = gameState.images[ASSETS.tabia.loss];
+        if (tabiaLoss) {
+            const scale = 0.6;
+            const w = tabiaLoss.width * scale;
+            const h = tabiaLoss.height * scale;
+            const x = 150;
+            const y = canvas.height - h - 50;
+            ctx.drawImage(tabiaLoss, x, y, w, h);
+        }
+
+        // Enemy victory pose (right side)
+        const enemySprite = gameState.images[battle.enemySprite];
+        if (enemySprite) {
+            const scale = 0.5;
+            const w = enemySprite.width * scale;
+            const h = enemySprite.height * scale;
+            const x = canvas.width - w - 150;
+            const y = canvas.height - h - 50;
+            ctx.drawImage(enemySprite, x, y, w, h);
+        }
+    }
+
+    // Draw result screen on top
+    drawPostBattle(winner);
 }
 
 // ============================================================================
 // POST-BATTLE RESULT SCREEN
 // ============================================================================
 function drawPostBattle(winner) {
-    // Background overlay
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.96)';                             // ADJUST: Background overlay color (R, G, B, opacity)
+    // Background overlay - semi-transparent so victory animations show through
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.17)';                              // ADJUST: Background overlay color - lighter to show animations
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     const battle = gameState.battle;
@@ -1244,7 +1325,8 @@ function gameLoop() {
     } else if (gameState.scene === 'BATTLE_START' || gameState.scene === 'TURN_SELECT' || gameState.scene === 'MOVE_SELECT' || gameState.scene === 'TURN_EXECUTE') {
         drawBattle();
     } else if (gameState.scene === 'POST_BATTLE') {
-        // Post battle screen handled separately
+        // Draw post battle screen with victory animations
+        drawPostBattleWithAnimations();
     }
 
     requestAnimationFrame(gameLoop);
