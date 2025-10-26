@@ -606,41 +606,41 @@ function drawStatPanelsWithIcons() {
     const bottomRightBox = gameState.images[ASSETS.uiBoxBottomRight];
     if (bottomRightBox) {
         const panelW = 300;                                            // ADJUST: Panel width
-        const panelH = 160;                                            // ADJUST: Panel height
-        const panelX = canvas.width - panelW - 10;                     // ADJUST: Distance from right edge (-10)
-        const panelY = 10;                                             // ADJUST: Distance from top edge
+        const panelH = 320;                                            // ADJUST: Panel height
+        const panelX = canvas.width - panelW - 0;                     // ADJUST: Distance from right edge (-10)
+        const panelY = 0;                                             // ADJUST: Distance from top edge
         ctx.drawImage(bottomRightBox, panelX, panelY, panelW, panelH);
 
         // Enemy icon
         const iconEnemy = gameState.images[ASSETS.iconEnemy];
         if (iconEnemy) {
-            ctx.drawImage(iconEnemy, panelX + 10, panelY + 10, 32, 32);  // ADJUST: Icon position relative to panel
+            ctx.drawImage(iconEnemy, panelX + 0, panelY + 50, 32, 32);  // ADJUST: Icon position relative to panel
         }
 
         // Enemy name
-        drawPixelText(battle.enemy.name, panelX + 50, panelY + 35, 36, '#FF6B6B', 'left', true);  // ADJUST: Name position & size & color
+        drawPixelText(battle.enemy.name, panelX + 5, panelY + 35, 20, '#000000ff', 'left', true);  // ADJUST: Name position & size & color
 
         // Hits counter
-        drawPixelText('HITS', panelX + 10, panelY + 70, 31, '#FFFFFF', 'left', false);             // ADJUST: Label position & size
-        drawPixelText(`${battle.enemy.hits} / 9`, panelX + 90, panelY + 70, 45, '#FF6B6B', 'left', true);  // ADJUST: Counter position & size & color
+        drawPixelText('HITS', panelX + 20, panelY + 110, 20, '#ffffffff', 'left', false);             // ADJUST: Label position & size
+        drawPixelText(`${battle.enemy.hits} / 9`, panelX + 120, panelY + 110, 20, '#fdfdfdff', 'left', true);  // ADJUST: Counter position & size & color
 
         // Heat bar
-        drawPixelText('HEAT', panelX + 10, panelY + 90, 27, '#FFFFFF', 'left', false);             // ADJUST: Heat label position
+        drawPixelText('HEAT', panelX + 20, panelY + 160, 20, '#ffffffff', 'left', false);             // ADJUST: Heat label position
         const heatPercent = Math.min(battle.enemy.heat / battle.enemy.stats.power, 1);
         const hpBarWidth = 200;                                        // ADJUST: Bar width
-        const hpBarHeight = 12;                                        // ADJUST: Bar height
+        const hpBarHeight = 20;                                        // ADJUST: Bar height
         ctx.fillStyle = '#222';                                        // ADJUST: Bar background color
-        ctx.fillRect(panelX + 60, panelY + 75, hpBarWidth, hpBarHeight);
-        const heatColor = heatPercent > 0.8 ? '#FF0000' : heatPercent > 0.5 ? '#FF8C00' : '#FFFF00';  // ADJUST: Heat colors
+        ctx.fillRect(panelX + 120, panelY + 140, hpBarWidth, hpBarHeight);
+        const heatColor = heatPercent > 0.8 ? '#FF0000' : heatPercent > 0.5 ? '#FF8C00' : '#0066ffff';  // ADJUST: Heat colors
         ctx.fillStyle = heatColor;
         ctx.fillRect(panelX + 60, panelY + 75, hpBarWidth * heatPercent, hpBarHeight);
 
         // Stats (no icons for enemy - just text)
-        drawPixelText(`GPU:${battle.enemy.stats.compute}`, panelX + 10, panelY + 120, 24, '#CCC', 'left', false);  // ADJUST: GPU stat position & size & color
-        drawPixelText(`CPU:${battle.enemy.stats.logic}`, panelX + 10, panelY + 137, 24, '#CCC', 'left', false);    // ADJUST: CPU stat position & size & color
-        drawPixelText(`I/O:${battle.enemy.stats.io}`, panelX + 10, panelY + 154, 24, '#CCC', 'left', false);       // ADJUST: I/O stat position & size & color
-        drawPixelText(`NET:${battle.enemy.stats.network}`, panelX + 125, panelY + 120, 24, '#CCC', 'left', false); // ADJUST: NET stat position & size & color
-        drawPixelText(`MEM:${battle.enemy.stats.memory}`, panelX + 125, panelY + 137, 24, '#CCC', 'left', false);  // ADJUST: MEM stat position & size & color
+        drawPixelText(`GPU:${battle.enemy.stats.compute}`, panelX + 5, panelY + 300, 20, '#d83dffff', 'left', false);  // ADJUST: GPU stat position & size & color
+        drawPixelText(`CPU:${battle.enemy.stats.logic}`, panelX + 5, panelY + 260, 20, '#d83dffff', 'left', false);    // ADJUST: CPU stat position & size & color
+        drawPixelText(`I/O:${battle.enemy.stats.io}`, panelX + 5, panelY + 220, 20, '#d83dffff', 'left', false);       // ADJUST: I/O stat position & size & color
+        drawPixelText(`NET:${battle.enemy.stats.network}`, panelX + 175, panelY + 220, 20, '#d83dffff', 'left', false); // ADJUST: NET stat position & size & color
+        drawPixelText(`MEM:${battle.enemy.stats.memory}`, panelX + 175, panelY + 260, 20, '#d83dffff', 'left', false);  // ADJUST: MEM stat position & size & color
     }
 }
 
@@ -653,7 +653,7 @@ function drawHitMissAnimation() {
 
     const sprite = gameState.images[anim.sprite];
     if (sprite) {
-        const scale = 1.5;                                             // ADJUST: Animation sprite size (1.5 = 150% of original)
+        const scale = 1;                                             // ADJUST: Animation sprite size (1.5 = 150% of original)
         const w = sprite.width * scale;
         const h = sprite.height * scale;
         const x = (canvas.width - w) / 2;                              // ADJUST: Centered horizontally (change to move left/right)
@@ -714,9 +714,9 @@ ctx.drawImage(commandPanelBox, 875, panelY, panelWidth, panelHeight);
     // ============================================================================
     const btnWidth = 200;                                              // ADJUST: Button width
     const btnHeight = 40;                                              // ADJUST: Button height
-    const btnSpacing = 25;                                             // ADJUST: Space between buttons
+    const btnSpacing = 5;                                             // ADJUST: Space between buttons
     const startX = (canvas.width - (btnWidth * 4 + btnSpacing * 3)) / 2;  // Auto-centered
-    const btnY = panelY + 20;                                          // ADJUST: Distance from panel top
+    const btnY = panelY + 10;                                          // ADJUST: Distance from panel top
 
     const commands = [
         { text: 'EXECUTE', enabled: true, key: 'execute' },            // ADJUST: Button text & enabled state
@@ -740,7 +740,7 @@ ctx.drawImage(commandPanelBox, 875, panelY, panelWidth, panelHeight);
         //ctx.strokeRect(btnX, btnY, btnWidth, btnHeight);
 
         // Button text - Dark text on light backgrounds
-        drawPixelText(cmd.text, btnX + btnWidth / 2, btnY + 33, 20, cmd.enabled ? '#2E4057' : '#999', 'center', true);  // ADJUST: Text position & size & colors (dark text)
+        drawPixelText(cmd.text, btnX + btnWidth / 2, btnY + 33, 15, cmd.enabled ? '#2E4057' : '#999', 'center', true);  // ADJUST: Text position & size & colors (dark text)
 
         if (cmd.enabled) {
             gameState.commandButtons.push({ key: cmd.key, x: btnX, y: btnY, w: btnWidth, h: btnHeight });
@@ -802,14 +802,14 @@ function drawMoveSelectionSidePanel() {
         ctx.strokeRect(btnX, btnY, btnWidth, btnHeight);
 
         // Move text (left side) - Darker colors for light background
-        drawPixelText(move.name, btnX + 15, btnY + 28, 31, '#ffffffff', 'left', true);              // ADJUST: Move name position & size & color (darker gold)
-        drawPixelText(`[${move.slot}]`, btnX + 15, btnY + 70, 19, '#fbff00ff', 'left', false);          // ADJUST: Slot text position & size & color (darker gray)
-        drawPixelText(move.description, btnX + 15, btnY + 110, 19, '#ffffffff', 'left', false);          // ADJUST: Description position & size & color (darker gray)
+        drawPixelText(move.name, btnX + 15, btnY + 28, 20, '#ffffffff', 'left', true);              // ADJUST: Move name position & size & color (darker gold)
+        drawPixelText(`[${move.slot}]`, btnX + 15, btnY + 70, 10, '#fbff00ff', 'left', false);          // ADJUST: Slot text position & size & color (darker gray)
+        drawPixelText(move.description, btnX + 15, btnY + 110, 10, '#ffffffff', 'left', false);          // ADJUST: Description position & size & color (darker gray)
 
         // Move stats (right side) - Darker colors for light background
-        drawPixelText(`DMG:${move.compute}`, btnX + btnWidth - 15, btnY + 35, 22, '#e9ff27ff', 'right', false);           // ADJUST: Damage stat (darker red)
-        drawPixelText(`HEAT:${move.heat > 0 ? '+' : ''}${move.heat}`, btnX + btnWidth - 15, btnY +70, 22, '#e9ff27ff', 'right', false);  // ADJUST: Heat stat (darker orange)
-        drawPixelText(`ACC:${move.accuracy}%`, btnX + btnWidth - 15, btnY + 100, 22, '#e9ff27ff', 'right', false);         // ADJUST: Accuracy stat (darker teal)
+        drawPixelText(`DMG:${move.compute}`, btnX + btnWidth - 15, btnY + 35, 15, '#e9ff27ff', 'right', false);           // ADJUST: Damage stat (darker red)
+        drawPixelText(`HEAT:${move.heat > 0 ? '+' : ''}${move.heat}`, btnX + btnWidth - 15, btnY +70, 15, '#e9ff27ff', 'right', false);  // ADJUST: Heat stat (darker orange)
+        drawPixelText(`ACC:${move.accuracy}%`, btnX + btnWidth - 15, btnY + 100, 15, '#e9ff27ff', 'right', false);         // ADJUST: Accuracy stat (darker teal)
 
         gameState.moveButtons.push({ move: move, x: btnX, y: btnY, w: btnWidth, h: btnHeight });
     });
