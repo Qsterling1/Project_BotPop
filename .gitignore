@@ -1,0 +1,122 @@
+# ============================================================================
+# AI Trainer - Git Ignore
+# Keep website public, hide documentation and internal files
+# ============================================================================
+
+# ============================================================================
+# DOCUMENTATION & PLANNING (PRIVATE)
+# ============================================================================
+
+# Docs folder - All documentation, reports, ledgers
+AiTrainer/Docs/
+AiTrainer/docs/
+
+# Planning documents
+AiTrainer/Planning_Documents/
+AiTrainer/planning_documents/
+Planning_Documents/
+planning_documents/
+
+# Ledger files anywhere in project
+**/living_ledger/
+**/ledger/
+**/*ledger*.md
+**/*LEDGER*.md
+
+# Planning and design documents
+**/*planning*.md
+**/*PLANNING*.md
+**/*plan*.txt
+**/*todo*.md
+**/*TODO*.md
+**/*notes*.md
+**/*NOTES*.md
+
+# Reports and documentation
+**/Reports/
+**/reports/
+**/*report*.md
+**/*REPORT*.md
+
+# ============================================================================
+# CLAUDE AI FILES (PRIVATE)
+# ============================================================================
+
+# Claude Code directory
+.claude/
+**/.claude/
+
+# Claude-related files
+.claude*
+**/claude_*.md
+**/*claude*.json
+
+# ============================================================================
+# BACKUP FILES
+# ============================================================================
+
+# Backup files
+*.backup
+*.bak
+*.old
+*.tmp
+*~
+.DS_Store
+
+# HTML backups
+index.html.backup
+*.html.backup
+
+# ============================================================================
+# DEVELOPMENT FILES
+# ============================================================================
+
+# Node modules (if ever added)
+node_modules/
+npm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~.nib
+
+# OS files
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# ============================================================================
+# TEMPORARY FILES
+# ============================================================================
+
+# Logs
+logs/
+*.log
+
+# Temporary directories
+temp/
+tmp/
+.temp/
+.tmp/
+
+# ============================================================================
+# WHAT IS PUBLIC (WEBSITE ONLY)
+# ============================================================================
+# The following are NOT ignored and will be public:
+# - index.html (root landing page)
+# - AiTrainer/WebGame/ (entire game folder)
+#   - index.html
+#   - main.js
+#   - manifest.json
+#   - service-worker.js
+# - AiTrainer/Art/ (all game assets)
+#   - Art/Sprites/
+#   - Art/Audio/
+# ============================================================================

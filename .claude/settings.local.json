@@ -3,7 +3,8 @@
     "allow": [
       "Bash(dir /b \"Q:\\FakeDesktop\\file\\create\\Project_BotPop\\AiTrainer\\Docs\\Reports\\living_ledger\")",
       "Bash(python:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(dir /b \"Q:\\FakeDesktop\\file\\create\\Project_BotPop\")"
     ],
     "deny": [],
     "ask": []
