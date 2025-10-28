@@ -6,7 +6,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="AI Trainer - Train your bot in epic battles">
+    <meta name="theme-color" content="#000000">
     <title>AI Trainer - Warm-Up Battle</title>
+    <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -20,7 +23,7 @@
         html {
             width: 100%;
             height: 100%;
-            overflow: hidden;
+            /* overflow: hidden; - REMOVED as requested */
         }
 
         body {
@@ -49,10 +52,21 @@
             overflow: hidden;
         }
 
+        .canvas-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 100vw;
+            max-height: 100vh;
+            width: 100%;
+            height: 100%;
+        }
+
         #gameCanvas {
             display: block;
             width: 100%;
-            max-width: 1280px;
+            max-width: min(1280px, 100vw);
+            max-height: 100vh;
             height: auto;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
@@ -67,6 +81,7 @@
             width: 100vw !important;
             height: 100vh !important;
             max-width: none !important;
+            max-height: none !important;
             object-fit: contain;
         }
 
@@ -76,7 +91,17 @@
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas" width="1280" height="720"></canvas>
+    <div class="canvas-wrapper">
+        <canvas id="gameCanvas" width="1280" height="720"></canvas>
+    </div>
     <script src="main.js"></script>
+    <script>
+        // Register service worker for PWA support
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(reg => console.log('[PWA] Service Worker registered:', reg.scope))
+                .catch(err => console.log('[PWA] Service Worker registration failed:', err));
+        }
+    </script>
 </body>
 </html>
