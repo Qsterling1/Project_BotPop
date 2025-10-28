@@ -25,7 +25,13 @@ const gameState = {
         hitMiss: null,
         frame: 0,
         duration: 0
-    }
+    },
+    fullscreen: {
+        visible: true,
+        hideTimer: null,
+        lastInteraction: Date.now()
+    },
+    firstInteraction: false
 };
 
 // ============================================================================
@@ -124,6 +130,13 @@ function playBGM() {
         audio.bgm.play().catch(err => console.log('BGM blocked:', err));
     } catch (err) {
         console.log('BGM error:', err);
+    }
+}
+
+function playDropSoundOnce() {
+    if (!gameState.firstInteraction) {
+        gameState.firstInteraction = true;
+        playSound('drop');
     }
 }
 
@@ -329,9 +342,6 @@ async function loadAllAssets() {
         gameState.scene = 'MENU';
         console.log('All assets loaded!');
 
-        // Play drop sound ONCE on menu load
-        playSound('drop');
-
         drawMainMenu();
     } catch (error) {
         console.error('Asset loading failed:', error);
@@ -356,6 +366,127 @@ function drawPixelText(text, x, y, size, color, align = 'left', bold = false) {
     // Fill with color
     ctx.fillStyle = color;
     ctx.fillText(text, x, y);
+}
+
+// ============================================================================
+// LOADING SCREEN
+// ============================================================================
+function drawLoadingScreen() {
+    // Background color
+    ctx.fillStyle = '#1a1a2e';  // ADJUST: Loading screen background color
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Loading text
+    const loadingText = 'Loading...';
+    drawPixelText(loadingText, canvas.width / 2, canvas.height / 2 - 30, 32, '#FFFFFF', 'center', true);
+
+    // Pulsing dots animation
+    const dotCount = Math.floor((Date.now() / 300) % 4);
+    const dots = '.'.repeat(dotCount);
+    drawPixelText('Please wait' + dots, canvas.width / 2, canvas.height / 2 + 20, 20, '#4ECDC4', 'center', false);
+}
+
+// ============================================================================
+// FULLSCREEN BUTTON SYSTEM
+// ============================================================================
+function isFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement ||
+              document.mozFullScreenElement || document.msFullscreenElement);
+}
+
+function requestFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen();
+    } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+    }
+}
+
+function updateFullscreenButton() {
+    // Show button if not in fullscreen
+    if (!isFullscreen()) {
+        gameState.fullscreen.visible = true;
+
+        // Auto-hide after 3 seconds of no interaction
+        clearTimeout(gameState.fullscreen.hideTimer);
+        gameState.fullscreen.hideTimer = setTimeout(() => {
+            gameState.fullscreen.visible = false;
+        }, 3000);
+    } else {
+        gameState.fullscreen.visible = false;
+    }
+}
+
+function drawFullscreenButton() {
+    if (!gameState.fullscreen.visible || isFullscreen() || gameState.scene === 'LOADING') {
+        return;
+    }
+
+    // Button position - bottom-right corner
+    const btnSize = 50;  // ADJUST: Fullscreen button size
+    const btnX = canvas.width - btnSize - 20;  // ADJUST: Distance from right edge
+    const btnY = canvas.height - btnSize - 20; // ADJUST: Distance from bottom edge
+
+    // Semi-transparent background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';  // ADJUST: Button background opacity
+    ctx.fillRect(btnX, btnY, btnSize, btnSize);
+
+    // Border
+    ctx.strokeStyle = '#4ECDC4';  // ADJUST: Button border color
+    ctx.lineWidth = 2;
+    ctx.strokeRect(btnX, btnY, btnSize, btnSize);
+
+    // Draw fullscreen icon (four corners)
+    ctx.strokeStyle = '#FFFFFF';  // ADJUST: Icon color
+    ctx.lineWidth = 3;
+    const iconPadding = 10;
+    const cornerSize = 8;
+
+    // Top-left corner
+    ctx.beginPath();
+    ctx.moveTo(btnX + iconPadding, btnX + iconPadding + cornerSize);
+    ctx.lineTo(btnX + iconPadding, btnY + iconPadding);
+    ctx.lineTo(btnX + iconPadding + cornerSize, btnY + iconPadding);
+    ctx.stroke();
+
+    // Top-right corner
+    ctx.beginPath();
+    ctx.moveTo(btnX + btnSize - iconPadding - cornerSize, btnY + iconPadding);
+    ctx.lineTo(btnX + btnSize - iconPadding, btnY + iconPadding);
+    ctx.lineTo(btnX + btnSize - iconPadding, btnY + iconPadding + cornerSize);
+    ctx.stroke();
+
+    // Bottom-left corner
+    ctx.beginPath();
+    ctx.moveTo(btnX + iconPadding, btnY + btnSize - iconPadding - cornerSize);
+    ctx.lineTo(btnX + iconPadding, btnY + btnSize - iconPadding);
+    ctx.lineTo(btnX + iconPadding + cornerSize, btnY + btnSize - iconPadding);
+    ctx.stroke();
+
+    // Bottom-right corner
+    ctx.beginPath();
+    ctx.moveTo(btnX + btnSize - iconPadding - cornerSize, btnY + btnSize - iconPadding);
+    ctx.lineTo(btnX + btnSize - iconPadding, btnY + btnSize - iconPadding);
+    ctx.lineTo(btnX + btnSize - iconPadding, btnY + btnSize - iconPadding - cornerSize);
+    ctx.stroke();
+
+    // Store button bounds for click detection
+    gameState.fullscreenButton = { x: btnX, y: btnY, w: btnSize, h: btnSize };
+}
+
+function handleFullscreenButtonClick(clickX, clickY) {
+    const btn = gameState.fullscreenButton;
+    if (btn && clickX >= btn.x && clickX <= btn.x + btn.w &&
+        clickY >= btn.y && clickY <= btn.y + btn.h) {
+        requestFullscreen();
+        return true;
+    }
+    return false;
 }
 
 // ============================================================================
@@ -1300,6 +1431,17 @@ canvas.addEventListener('click', (e) => {
     const clickX = (e.clientX - rect.left) * scaleX;
     const clickY = (e.clientY - rect.top) * scaleY;
 
+    // Handle user interaction for fullscreen button visibility
+    updateFullscreenButton();
+
+    // Check if fullscreen button was clicked (works on all screens)
+    if (handleFullscreenButtonClick(clickX, clickY)) {
+        return;
+    }
+
+    // Play drop sound on first interaction
+    playDropSoundOnce();
+
     if (gameState.scene === 'MENU') {
         const backBtn = gameState.backToLandingBounds;
         if (backBtn && clickX >= backBtn.x && clickX <= backBtn.x + backBtn.w &&
@@ -1374,7 +1516,9 @@ canvas.addEventListener('click', (e) => {
 
 function gameLoop() {
     // Continuous rendering based on current scene
-    if (gameState.scene === 'MENU') {
+    if (gameState.scene === 'LOADING') {
+        drawLoadingScreen();
+    } else if (gameState.scene === 'MENU') {
         drawMainMenu();
     } else if (gameState.scene === 'CHALLENGE') {
         drawChallengeScreen();
@@ -1384,6 +1528,9 @@ function gameLoop() {
         // Draw post battle screen with victory animations
         drawPostBattleWithAnimations();
     }
+
+    // Draw fullscreen button overlay on all screens (except loading)
+    drawFullscreenButton();
 
     requestAnimationFrame(gameLoop);
 }
@@ -1400,6 +1547,18 @@ window.addEventListener('load', () => {
     console.log('Pixel font with stroke outline for readability');
     console.log('Hit/Miss/Direct Hit/Give-up animations');
     console.log('Back to landing page button');
+    console.log('Added: Loading screen, fullscreen button, drop sound control');
     loadAllAssets();
     gameLoop(); // Start continuous render loop
 });
+
+// Listen for fullscreen changes to update button visibility
+document.addEventListener('fullscreenchange', () => updateFullscreenButton());
+document.addEventListener('webkitfullscreenchange', () => updateFullscreenButton());
+document.addEventListener('mozfullscreenchange', () => updateFullscreenButton());
+document.addEventListener('msfullscreenchange', () => updateFullscreenButton());
+
+// Show fullscreen button on any user interaction
+canvas.addEventListener('touchstart', () => updateFullscreenButton());
+canvas.addEventListener('mousedown', () => updateFullscreenButton());
+canvas.addEventListener('mousemove', () => updateFullscreenButton());
