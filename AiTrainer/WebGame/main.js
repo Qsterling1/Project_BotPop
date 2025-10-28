@@ -31,7 +31,8 @@ const gameState = {
         hideTimer: null,
         lastInteraction: Date.now(),
         pressed: false,  // Visual feedback for button press
-        mobileFullscreen: false  // Track mobile fullscreen state
+        mobileFullscreen: false,  // Track mobile fullscreen state
+        firstTouchHandled: false  // Track if first touch fullscreen was attempted
     },
     firstInteraction: false
 };
@@ -1741,8 +1742,24 @@ window.addEventListener('load', () => {
     console.log('Hit/Miss/Direct Hit/Give-up animations');
     console.log('Back to landing page button');
     console.log('Added: Loading screen, fullscreen button, drop sound control');
-    loadAllAssets();
-    gameLoop(); // Start continuous render loop
+    console.log('Added: PWA support with manifest and service worker');
+
+    // Start game loop immediately to show loading screen
+    gameLoop();
+
+    // Load assets when browser is idle for better performance
+    if ('requestIdleCallback' in window) {
+        console.log('[LOADER] Using requestIdleCallback for asset loading');
+        requestIdleCallback(() => {
+            loadAllAssets();
+        });
+    } else {
+        // Fallback for browsers that don't support requestIdleCallback
+        console.log('[LOADER] Using setTimeout fallback for asset loading');
+        setTimeout(() => {
+            loadAllAssets();
+        }, 100);
+    }
 });
 
 // Listen for fullscreen changes to update button visibility
@@ -1773,3 +1790,25 @@ window.addEventListener('orientationchange', () => {
         }, 100);
     }
 });
+
+// One-time fullscreen request on first touch (mobile optimization)
+function handleFirstTouch() {
+    if (gameState.fullscreen.firstTouchHandled) {
+        return;
+    }
+
+    gameState.fullscreen.firstTouchHandled = true;
+    console.log('[FIRST-TOUCH] First touch detected - attempting auto-fullscreen');
+
+    // Only auto-fullscreen on mobile devices
+    if (isMobile() && !isFullscreen()) {
+        console.log('[FIRST-TOUCH] Mobile detected, entering fullscreen');
+        enterMobileFullscreen();
+    }
+
+    // Remove the listener after first touch
+    document.removeEventListener('touchstart', handleFirstTouch, { passive: true });
+}
+
+// Add first touch listener for mobile
+document.addEventListener('touchstart', handleFirstTouch, { passive: true });
