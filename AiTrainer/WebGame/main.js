@@ -30,7 +30,8 @@ const gameState = {
         visible: true,
         hideTimer: null,
         lastInteraction: Date.now(),
-        pressed: false  // Visual feedback for button press
+        pressed: false,  // Visual feedback for button press
+        mobileFullscreen: false  // Track mobile fullscreen state
     },
     firstInteraction: false
 };
@@ -391,12 +392,96 @@ function drawLoadingScreen() {
 // FULLSCREEN BUTTON SYSTEM
 // ============================================================================
 function isFullscreen() {
+    // Check both native fullscreen and mobile fullscreen mode
     return !!(document.fullscreenElement || document.webkitFullscreenElement ||
-              document.mozFullScreenElement || document.msFullscreenElement);
+              document.mozFullScreenElement || document.msFullscreenElement ||
+              gameState.fullscreen.mobileFullscreen);
+}
+
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function enterMobileFullscreen() {
+    console.log('[MOBILE-FULLSCREEN] Entering mobile fullscreen mode...');
+
+    // Add mobile fullscreen class to body
+    document.body.classList.add('mobile-fullscreen');
+
+    // Set mobile fullscreen state
+    gameState.fullscreen.mobileFullscreen = true;
+
+    // Lock screen orientation to landscape if possible
+    if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').then(() => {
+            console.log('[MOBILE-FULLSCREEN] Locked to landscape');
+        }).catch(err => {
+            console.log('[MOBILE-FULLSCREEN] Could not lock orientation:', err);
+        });
+    }
+
+    // Try to hide address bar by scrolling
+    setTimeout(() => {
+        window.scrollTo(0, 1);
+        document.body.scrollTop = 1;
+    }, 100);
+
+    // Resize canvas to fill viewport
+    resizeCanvasForMobile();
+
+    console.log('[MOBILE-FULLSCREEN] Mobile fullscreen activated');
+}
+
+function exitMobileFullscreen() {
+    console.log('[MOBILE-FULLSCREEN] Exiting mobile fullscreen mode...');
+
+    // Remove mobile fullscreen class
+    document.body.classList.remove('mobile-fullscreen');
+
+    // Clear mobile fullscreen state
+    gameState.fullscreen.mobileFullscreen = false;
+
+    // Unlock orientation if possible
+    if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+        console.log('[MOBILE-FULLSCREEN] Unlocked orientation');
+    }
+
+    // Restore canvas size
+    window.scrollTo(0, 0);
+
+    console.log('[MOBILE-FULLSCREEN] Mobile fullscreen deactivated');
+}
+
+function resizeCanvasForMobile() {
+    if (!gameState.fullscreen.mobileFullscreen) return;
+
+    const canvas = document.getElementById('gameCanvas');
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+
+    console.log('[MOBILE-FULLSCREEN] Resizing canvas to:', windowWidth, 'x', windowHeight);
+
+    // Update canvas display size (CSS)
+    canvas.style.width = windowWidth + 'px';
+    canvas.style.height = windowHeight + 'px';
+
+    // Keep internal resolution the same for rendering
+    // The CSS will scale it
 }
 
 function requestFullscreen() {
     console.log('[FULLSCREEN] Button clicked - attempting fullscreen...');
+    console.log('[FULLSCREEN] Is mobile?', isMobile());
+
+    // For mobile devices, use custom mobile fullscreen mode
+    if (isMobile()) {
+        console.log('[FULLSCREEN] Mobile device detected - using mobile fullscreen mode');
+        enterMobileFullscreen();
+        return;
+    }
+
+    // For desktop, try native fullscreen API
     const elem = document.documentElement;
 
     // Log available APIs
@@ -415,17 +500,19 @@ function requestFullscreen() {
             console.log('[FULLSCREEN] Success!');
         }).catch(err => {
             console.log('[FULLSCREEN] Standard API failed:', err);
+            // Fallback to mobile fullscreen
+            enterMobileFullscreen();
         });
     }
     // WebKit (Safari, Chrome on iOS/Android)
     else if (elem.webkitRequestFullscreen) {
         console.log('[FULLSCREEN] Using webkit requestFullscreen API');
-        elem.webkitRequestFullscreen();
-    }
-    // iOS Safari specific - try canvas element
-    else if (elem.webkitEnterFullscreen) {
-        console.log('[FULLSCREEN] Using webkit enterFullscreen API');
-        elem.webkitEnterFullscreen();
+        try {
+            elem.webkitRequestFullscreen();
+        } catch (err) {
+            console.log('[FULLSCREEN] WebKit API failed:', err);
+            enterMobileFullscreen();
+        }
     }
     // Firefox
     else if (elem.mozRequestFullScreen) {
@@ -437,24 +524,10 @@ function requestFullscreen() {
         console.log('[FULLSCREEN] Using IE/Edge msRequestFullscreen API');
         elem.msRequestFullscreen();
     }
-    // Mobile fallback - try to maximize viewport
+    // Fallback to mobile fullscreen mode
     else {
-        console.log('[FULLSCREEN] No document-level API, trying canvas...');
-        // Try canvas-specific fullscreen
-        const canvas = document.getElementById('gameCanvas');
-        if (canvas && canvas.requestFullscreen) {
-            console.log('[FULLSCREEN] Using canvas requestFullscreen');
-            canvas.requestFullscreen().catch(err => {
-                console.log('[FULLSCREEN] Canvas fullscreen failed:', err);
-            });
-        } else if (canvas && canvas.webkitRequestFullscreen) {
-            console.log('[FULLSCREEN] Using canvas webkit requestFullscreen');
-            canvas.webkitRequestFullscreen();
-        } else {
-            console.log('[FULLSCREEN] API not supported on this device');
-            console.log('[FULLSCREEN] User agent:', navigator.userAgent);
-            // Don't alert - just log for debugging
-        }
+        console.log('[FULLSCREEN] No native API available, using mobile fullscreen');
+        enterMobileFullscreen();
     }
 }
 
@@ -568,11 +641,12 @@ function drawFullscreenButton() {
     ctx.lineTo(centerX + iconSize, centerY + iconSize);
     ctx.stroke();
 
-    // Text label for clarity
+    // Text label for clarity - show different text based on state
     ctx.font = 'bold 14px "Press Start 2P", monospace';
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.fillText('FULLSCREEN', btnX + btnWidth / 2 + 15, centerY + 5);
+    const buttonText = gameState.fullscreen.mobileFullscreen ? 'EXIT' : 'FULLSCREEN';
+    ctx.fillText(buttonText, btnX + btnWidth / 2 + 15, centerY + 5);
 
     // Store button bounds for click detection (larger hit area)
     gameState.fullscreenButton = {
@@ -591,8 +665,12 @@ function handleFullscreenButtonClick(clickX, clickY) {
         // Visual feedback - button pressed
         gameState.fullscreen.pressed = true;
 
-        // Request fullscreen
-        requestFullscreen();
+        // Toggle fullscreen/mobile fullscreen
+        if (gameState.fullscreen.mobileFullscreen) {
+            exitMobileFullscreen();
+        } else {
+            requestFullscreen();
+        }
 
         // Reset pressed state after short delay
         setTimeout(() => {
@@ -1677,3 +1755,21 @@ document.addEventListener('msfullscreenchange', () => updateFullscreenButton());
 canvas.addEventListener('touchstart', () => updateFullscreenButton());
 canvas.addEventListener('mousedown', () => updateFullscreenButton());
 canvas.addEventListener('mousemove', () => updateFullscreenButton());
+
+// Handle window resize for mobile fullscreen
+window.addEventListener('resize', () => {
+    if (gameState.fullscreen.mobileFullscreen) {
+        resizeCanvasForMobile();
+    }
+});
+
+// Handle orientation changes
+window.addEventListener('orientationchange', () => {
+    console.log('[MOBILE-FULLSCREEN] Orientation changed');
+    if (gameState.fullscreen.mobileFullscreen) {
+        setTimeout(() => {
+            resizeCanvasForMobile();
+            window.scrollTo(0, 1); // Hide address bar again
+        }, 100);
+    }
+});
