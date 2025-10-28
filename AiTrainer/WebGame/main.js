@@ -29,7 +29,8 @@ const gameState = {
     fullscreen: {
         visible: true,
         hideTimer: null,
-        lastInteraction: Date.now()
+        lastInteraction: Date.now(),
+        pressed: false  // Visual feedback for button press
     },
     firstInteraction: false
 };
@@ -395,15 +396,65 @@ function isFullscreen() {
 }
 
 function requestFullscreen() {
+    console.log('[FULLSCREEN] Button clicked - attempting fullscreen...');
     const elem = document.documentElement;
+
+    // Log available APIs
+    console.log('[FULLSCREEN] Available APIs:', {
+        standard: !!elem.requestFullscreen,
+        webkit: !!elem.webkitRequestFullscreen,
+        webkitEnter: !!elem.webkitEnterFullscreen,
+        moz: !!elem.mozRequestFullScreen,
+        ms: !!elem.msRequestFullscreen
+    });
+
+    // Try standard fullscreen API first
     if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) {
+        console.log('[FULLSCREEN] Using standard requestFullscreen API');
+        elem.requestFullscreen().then(() => {
+            console.log('[FULLSCREEN] Success!');
+        }).catch(err => {
+            console.log('[FULLSCREEN] Standard API failed:', err);
+        });
+    }
+    // WebKit (Safari, Chrome on iOS/Android)
+    else if (elem.webkitRequestFullscreen) {
+        console.log('[FULLSCREEN] Using webkit requestFullscreen API');
         elem.webkitRequestFullscreen();
-    } else if (elem.mozRequestFullScreen) {
+    }
+    // iOS Safari specific - try canvas element
+    else if (elem.webkitEnterFullscreen) {
+        console.log('[FULLSCREEN] Using webkit enterFullscreen API');
+        elem.webkitEnterFullscreen();
+    }
+    // Firefox
+    else if (elem.mozRequestFullScreen) {
+        console.log('[FULLSCREEN] Using Firefox mozRequestFullScreen API');
         elem.mozRequestFullScreen();
-    } else if (elem.msRequestFullscreen) {
+    }
+    // IE/Edge
+    else if (elem.msRequestFullscreen) {
+        console.log('[FULLSCREEN] Using IE/Edge msRequestFullscreen API');
         elem.msRequestFullscreen();
+    }
+    // Mobile fallback - try to maximize viewport
+    else {
+        console.log('[FULLSCREEN] No document-level API, trying canvas...');
+        // Try canvas-specific fullscreen
+        const canvas = document.getElementById('gameCanvas');
+        if (canvas && canvas.requestFullscreen) {
+            console.log('[FULLSCREEN] Using canvas requestFullscreen');
+            canvas.requestFullscreen().catch(err => {
+                console.log('[FULLSCREEN] Canvas fullscreen failed:', err);
+            });
+        } else if (canvas && canvas.webkitRequestFullscreen) {
+            console.log('[FULLSCREEN] Using canvas webkit requestFullscreen');
+            canvas.webkitRequestFullscreen();
+        } else {
+            console.log('[FULLSCREEN] API not supported on this device');
+            console.log('[FULLSCREEN] User agent:', navigator.userAgent);
+            // Don't alert - just log for debugging
+        }
     }
 }
 
@@ -427,63 +478,127 @@ function drawFullscreenButton() {
         return;
     }
 
-    // Button position - bottom-right corner
-    const btnSize = 50;  // ADJUST: Fullscreen button size
-    const btnX = canvas.width - btnSize - 20;  // ADJUST: Distance from right edge
-    const btnY = canvas.height - btnSize - 20; // ADJUST: Distance from bottom edge
+    // Button position - bottom-center for easy mobile access
+    const btnWidth = 180;  // ADJUST: Button width (wider for easier clicking)
+    const btnHeight = 60;  // ADJUST: Button height
+    const btnX = (canvas.width - btnWidth) / 2;  // Centered horizontally
+    const btnY = canvas.height - btnHeight - 15; // ADJUST: Distance from bottom
 
-    // Semi-transparent background
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';  // ADJUST: Button background opacity
-    ctx.fillRect(btnX, btnY, btnSize, btnSize);
+    // Modern transparent background with subtle gradient
+    // Brighter when pressed for visual feedback
+    const opacity = gameState.fullscreen.pressed ? 0.15 : 0.08;
+    const gradient = ctx.createLinearGradient(btnX, btnY, btnX, btnY + btnHeight);
+    gradient.addColorStop(0, `rgba(255, 255, 255, ${opacity})`);
+    gradient.addColorStop(1, `rgba(255, 255, 255, ${opacity * 0.4})`);
 
-    // Border
-    ctx.strokeStyle = '#4ECDC4';  // ADJUST: Button border color
-    ctx.lineWidth = 2;
-    ctx.strokeRect(btnX, btnY, btnSize, btnSize);
-
-    // Draw fullscreen icon (four corners)
-    ctx.strokeStyle = '#FFFFFF';  // ADJUST: Icon color
-    ctx.lineWidth = 3;
-    const iconPadding = 10;
-    const cornerSize = 8;
-
-    // Top-left corner
+    // Rounded rectangle background
+    ctx.fillStyle = gradient;
     ctx.beginPath();
-    ctx.moveTo(btnX + iconPadding, btnX + iconPadding + cornerSize);
-    ctx.lineTo(btnX + iconPadding, btnY + iconPadding);
-    ctx.lineTo(btnX + iconPadding + cornerSize, btnY + iconPadding);
+    const radius = 12;  // ADJUST: Corner radius for smooth look
+    ctx.moveTo(btnX + radius, btnY);
+    ctx.lineTo(btnX + btnWidth - radius, btnY);
+    ctx.arcTo(btnX + btnWidth, btnY, btnX + btnWidth, btnY + radius, radius);
+    ctx.lineTo(btnX + btnWidth, btnY + btnHeight - radius);
+    ctx.arcTo(btnX + btnWidth, btnY + btnHeight, btnX + btnWidth - radius, btnY + btnHeight, radius);
+    ctx.lineTo(btnX + radius, btnY + btnHeight);
+    ctx.arcTo(btnX, btnY + btnHeight, btnX, btnY + btnHeight - radius, radius);
+    ctx.lineTo(btnX, btnY + radius);
+    ctx.arcTo(btnX, btnY, btnX + radius, btnY, radius);
+    ctx.closePath();
+    ctx.fill();
+
+    // Subtle border
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';  // ADJUST: Border opacity
+    ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Top-right corner
+    // Draw modern fullscreen icon - four expanding arrows
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';  // ADJUST: Icon color/opacity
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    const centerX = btnX + btnWidth / 2 - 35;
+    const centerY = btnY + btnHeight / 2;
+    const iconSize = 16;  // Size of the icon
+    const arrowSize = 6;
+
+    // Top-left arrow
     ctx.beginPath();
-    ctx.moveTo(btnX + btnSize - iconPadding - cornerSize, btnY + iconPadding);
-    ctx.lineTo(btnX + btnSize - iconPadding, btnY + iconPadding);
-    ctx.lineTo(btnX + btnSize - iconPadding, btnY + iconPadding + cornerSize);
+    ctx.moveTo(centerX + iconSize, centerY - iconSize);
+    ctx.lineTo(centerX, centerY - iconSize);
+    ctx.lineTo(centerX, centerY - iconSize + arrowSize);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(centerX + iconSize - arrowSize, centerY - iconSize);
+    ctx.lineTo(centerX, centerY - iconSize);
     ctx.stroke();
 
-    // Bottom-left corner
+    // Top-right arrow
     ctx.beginPath();
-    ctx.moveTo(btnX + iconPadding, btnY + btnSize - iconPadding - cornerSize);
-    ctx.lineTo(btnX + iconPadding, btnY + btnSize - iconPadding);
-    ctx.lineTo(btnX + iconPadding + cornerSize, btnY + btnSize - iconPadding);
+    ctx.moveTo(centerX + iconSize * 2, centerY - iconSize + arrowSize);
+    ctx.lineTo(centerX + iconSize * 2, centerY - iconSize);
+    ctx.lineTo(centerX + iconSize * 2 - arrowSize, centerY - iconSize);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(centerX + iconSize * 2, centerY - iconSize);
+    ctx.lineTo(centerX + iconSize * 2, centerY - iconSize + arrowSize);
     ctx.stroke();
 
-    // Bottom-right corner
+    // Bottom-left arrow
     ctx.beginPath();
-    ctx.moveTo(btnX + btnSize - iconPadding - cornerSize, btnY + btnSize - iconPadding);
-    ctx.lineTo(btnX + btnSize - iconPadding, btnY + btnSize - iconPadding);
-    ctx.lineTo(btnX + btnSize - iconPadding, btnY + btnSize - iconPadding - cornerSize);
+    ctx.moveTo(centerX, centerY + iconSize - arrowSize);
+    ctx.lineTo(centerX, centerY + iconSize);
+    ctx.lineTo(centerX + arrowSize, centerY + iconSize);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY + iconSize);
+    ctx.lineTo(centerX + iconSize, centerY + iconSize);
     ctx.stroke();
 
-    // Store button bounds for click detection
-    gameState.fullscreenButton = { x: btnX, y: btnY, w: btnSize, h: btnSize };
+    // Bottom-right arrow
+    ctx.beginPath();
+    ctx.moveTo(centerX + iconSize * 2 - arrowSize, centerY + iconSize);
+    ctx.lineTo(centerX + iconSize * 2, centerY + iconSize);
+    ctx.lineTo(centerX + iconSize * 2, centerY + iconSize - arrowSize);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(centerX + iconSize * 2, centerY + iconSize);
+    ctx.lineTo(centerX + iconSize, centerY + iconSize);
+    ctx.stroke();
+
+    // Text label for clarity
+    ctx.font = 'bold 14px "Press Start 2P", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.fillText('FULLSCREEN', btnX + btnWidth / 2 + 15, centerY + 5);
+
+    // Store button bounds for click detection (larger hit area)
+    gameState.fullscreenButton = {
+        x: btnX - 10,  // Extra padding for easier clicking
+        y: btnY - 10,
+        w: btnWidth + 20,
+        h: btnHeight + 20
+    };
 }
 
 function handleFullscreenButtonClick(clickX, clickY) {
     const btn = gameState.fullscreenButton;
     if (btn && clickX >= btn.x && clickX <= btn.x + btn.w &&
         clickY >= btn.y && clickY <= btn.y + btn.h) {
+
+        // Visual feedback - button pressed
+        gameState.fullscreen.pressed = true;
+
+        // Request fullscreen
         requestFullscreen();
+
+        // Reset pressed state after short delay
+        setTimeout(() => {
+            gameState.fullscreen.pressed = false;
+        }, 200);
+
         return true;
     }
     return false;
