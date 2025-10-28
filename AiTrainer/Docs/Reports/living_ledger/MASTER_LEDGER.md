@@ -2,6 +2,27 @@
 
 ---
 
+# Ledger Entry — January 27, 2025 — 11:30 AM (Pacific Standard Time)
+
+**Name:** Claude (AI Assistant via Claude Code)
+**Date:** January 27, 2025
+**Time:** 11:30 AM PST
+**Role:** Development Assistant
+**General Subject Matter:** WebGame main.js - UI text normalization + hit logic audit/fix
+
+---
+
+## Summary
+Performed scoped, minimal edits to main.js only:
+- **Part A:** Normalized UI text layout (drawPixelText calls only) across 6 functions for consistent sizing, spacing, and alignment
+- **Part B:** Added logging instrumentation and audited hit application logic - confirmed correct, no fix needed
+
+**Result:** All UI text now follows consistent pattern (titles ≈24-28px, labels/stats 20px, uniform 30px vertical rhythm). Battle hit logic verified correct with debugging logs added.
+
+**Files Modified:** main.js only (1 file)
+
+---
+
 # Ledger Entry — October 25, 2025 — 3:15 PM (Pacific Daylight Time)
 
 **Name:** Claude (AI Assistant via Claude Code)

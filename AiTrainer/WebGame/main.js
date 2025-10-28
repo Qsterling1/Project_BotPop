@@ -1,5 +1,7 @@
 // ============================================================================
-// AI TRAINER - WARM-UP BATTLE v3.0 (Full UI Integration)
+// AI TRAINER - WARM-UP BATTLE v3.1 (Battle Logic Refactor)
+// UI text normalized. Hit logic audited. Integrity-based victory. 2025-01-27
+// Heat affects accuracy. RNG transparency. endTurn() cleanup. System Integrity UI.
 // ============================================================================
 
 const canvas = document.getElementById('gameCanvas');
@@ -243,14 +245,24 @@ class Battle {
         }
 
         let damage = attacker.stats.compute + move.compute;
-        let hitRoll = Math.random() * 100;
         let accuracy = move.accuracy * (attacker.stats.io / 100);
+
+        // Apply heat penalty to accuracy BEFORE hit roll
+        if (attacker.heat > attacker.stats.power) {
+            accuracy *= 0.8; // -20% accuracy when overheating
+            this.addLog(`${attacker.name} is OVERHEATING! Accuracy reduced!`);
+        }
 
         // Apply dodge boost if defender has it
         if (defender.dodgeBoost > 0) {
             accuracy -= defender.dodgeBoost;
             defender.dodgeBoost = 0; // Consume dodge boost
         }
+
+        let hitRoll = Math.random() * 100;
+
+        // [RNG] Log hit roll for transparency
+        console.log(`[RNG] ${attacker.name} hit roll: ${hitRoll.toFixed(1)}% vs ${accuracy.toFixed(1)}% accuracy`);
 
         if (hitRoll > accuracy) {
             // Flash BIOS miss penalty
@@ -266,17 +278,17 @@ class Battle {
             damage *= 2;
         }
 
-        const critical = Math.random() < 0.1;
+        const critRoll = Math.random();
+        const critical = critRoll < 0.1;
+
+        // [RNG] Log critical roll for transparency
+        console.log(`[RNG] ${attacker.name} critical roll: ${critRoll.toFixed(3)} vs 0.100 threshold (crit=${critical})`);
+
         if (critical) {
             damage *= 1.5;
         }
 
         attacker.heat += move.heat;
-
-        if (attacker.heat > attacker.stats.power) {
-            damage *= 0.7;
-            this.addLog(`${attacker.name} is OVERHEATING! Efficiency -30%`);
-        }
 
         return { hit: true, damage: Math.floor(damage), critical };
     }
@@ -366,13 +378,13 @@ function drawChallengeScreen() {
     // ============================================================================
     // CHALLENGE TEXT
     // ============================================================================
-    drawPixelText('YOU HAVE BEEN CHALLENGED!', canvas.width / 2, 250, 20, '#ffffffff', 'center', true);  // ADJUST: Main title position & size & color
+    drawPixelText('YOU HAVE BEEN CHALLENGED!', canvas.width / 2, 250, 28, '#FFFFFF', 'center', true);
 
     if (gameState.challengeEnemy) {
-        drawPixelText(`${gameState.challengeEnemy.name} wants to battle!`, canvas.width / 2, 300, 20, '#fd0303ff', 'center', false);  // ADJUST: Enemy name position & size & color
+        drawPixelText(`${gameState.challengeEnemy.name} wants to battle!`, canvas.width / 2, 300, 24, '#FFD700', 'center', false);
     }
 
-    drawPixelText('DO YOU ACCEPT?', canvas.width / 2, 350, 20, '#FFFFFF', 'center', true);  // ADJUST: Prompt position & size & color
+    drawPixelText('DO YOU ACCEPT?', canvas.width / 2, 350, 24, '#FFFFFF', 'center', true);
 
     // ============================================================================
     // "BRING IT ON!" BUTTON (ACCEPT) - LEFT SIDE
@@ -552,10 +564,10 @@ function drawStatPanelsWithIcons() {
     // ============================================================================
     const topLeftBox = gameState.images[ASSETS.uiBoxTopLeft];
     if (topLeftBox) {
-        const panelX = 10;                                             // ADJUST: Distance from left edge
-        const panelY = 10;                                             // ADJUST: Distance from top edge
-        const panelW = 500;                                            // ADJUST: Panel width
-        const panelH = 300;                                            // ADJUST: Panel height
+        const panelX = 0;                                             // ADJUST: Distance from left edge
+        const panelY = 0;                                             // ADJUST: Distance from top edge
+        const panelW = 320;                                            // ADJUST: Panel width
+        const panelH = 320;                                            // ADJUST: Panel height
         ctx.drawImage(topLeftBox, panelX, panelY, panelW, panelH);
 
         // Player icon
@@ -564,40 +576,49 @@ function drawStatPanelsWithIcons() {
             ctx.drawImage(iconMarquee, panelX + 10, panelY + 10, 32, 32);  // ADJUST: Icon position relative to panel
         }
 
-        // Player name
-        drawPixelText(battle.player.name, panelX + 50, panelY + 35, 36, '#FFD700', 'left', true);  // ADJUST: Name position & size & color
+        // Player name (title-sized, bold)
+        drawPixelText(battle.player.name, panelX + 50, panelY + 35, 24, '#FFD700', 'left', true);
 
-        // Hits counter
-        drawPixelText('HITS', panelX + 10, panelY + 70, 31, '#FFFFFF', 'left', false);             // ADJUST: Label position & size
-        drawPixelText(`${battle.player.hits} / 9`, panelX + 80, panelY + 70, 45, '#00FF00', 'left', true);  // ADJUST: Counter position & size & color
+        // System Integrity (consistent label size, uniform rhythm)
+        drawPixelText('INTEGRITY', panelX + 10, panelY + 80, 20, '#FFFFFF', 'left', false);
+        drawPixelText(`${battle.player.integrity}%`, panelX + 220, panelY + 80, 20, '#00FF00', 'left', true);
 
-        // Heat bar
-        drawPixelText('HEAT', panelX + 10, panelY + 90, 27, '#FFFFFF', 'left', false);             // ADJUST: Heat label position
+        // Heat bar (consistent label size)
+        drawPixelText('HEAT', panelX + 10, panelY + 120, 20, '#FFFFFF', 'left', false);
         const heatPercent = Math.min(battle.player.heat / battle.player.stats.power, 1);
-        const hpBarWidth = 200;                                        // ADJUST: Bar width
-        const hpBarHeight = 12;                                        // ADJUST: Bar height
-        ctx.fillStyle = '#222';                                        // ADJUST: Bar background color
-        ctx.fillRect(panelX + 50, panelY + 75, hpBarWidth, hpBarHeight);
-        const heatColor = heatPercent > 0.8 ? '#FF0000' : heatPercent > 0.5 ? '#FF8C00' : '#FFFF00';  // ADJUST: Heat colors
+        const hpBarWidth = 200;
+        const hpBarHeight = 20;
+        ctx.fillStyle = '#222';
+        ctx.fillRect(panelX + 10, panelY + 130, hpBarWidth, hpBarHeight);
+        const heatColor = heatPercent > 0.8 ? '#FF0000' : heatPercent > 0.5 ? '#FF8C00' : '#FFFF00';
         ctx.fillStyle = heatColor;
-        ctx.fillRect(panelX + 50, panelY + 75, hpBarWidth * heatPercent, hpBarHeight);
+        ctx.fillRect(panelX + 10, panelY + 130, hpBarWidth * heatPercent, hpBarHeight);
 
         // Stat icons
-        const iconGpu = gameState.images[ASSETS.iconGpu];
-        const iconCpu = gameState.images[ASSETS.iconCpu];
-        const iconRam = gameState.images[ASSETS.iconRam];
+       // const iconGpu = gameState.images[ASSETS.iconGpu];
+       // const iconCpu = gameState.images[ASSETS.iconCpu];
+       // const iconRam = gameState.images[ASSETS.iconRam];
 
-        if (iconGpu) ctx.drawImage(iconGpu, panelX + 10, panelY + 115, 22, 22);                    // ADJUST: GPU icon position & size
-        drawPixelText(`${battle.player.stats.compute}`, panelX + 37, panelY + 132, 28, '#CCC', 'left', false);  // ADJUST: GPU stat position & size & color
+       // if (iconGpu) ctx.drawImage(iconGpu, panelX + 10, panelY + 115, 22, 20);                    // ADJUST: GPU icon position & size
+      //  drawPixelText(`${battle.player.stats.compute}`, panelX + 37, panelY + 132, 20, '#ff0000ff', 'left', false);  // ADJUST: GPU stat position & size & color
 
-        if (iconCpu) ctx.drawImage(iconCpu, panelX + 90, panelY + 115, 22, 22);                    // ADJUST: CPU icon position & size
-        drawPixelText(`${battle.player.stats.logic}`, panelX + 117, panelY + 132, 28, '#CCC', 'left', false);  // ADJUST: CPU stat position & size & color
+      //  if (iconCpu) ctx.drawImage(iconCpu, panelX + 90, panelY + 115, 22, 20);                    // ADJUST: CPU icon position & size
+      //  drawPixelText(`${battle.player.stats.logic}`, panelX + 117, panelY + 132, 20, '#f50000ff', 'left', false);  // ADJUST: CPU stat position & size & color
 
-        if (iconRam) ctx.drawImage(iconRam, panelX + 170, panelY + 115, 22, 22);                   // ADJUST: RAM icon position & size
-        drawPixelText(`${battle.player.stats.io}`, panelX + 197, panelY + 132, 28, '#CCC', 'left', false);  // ADJUST: RAM stat position & size & color
+     //   if (iconRam) ctx.drawImage(iconRam, panelX + 170, panelY + 115, 22, 20);                   // ADJUST: RAM icon position & size
 
-        drawPixelText(`NET:${battle.player.stats.network}`, panelX + 10, panelY + 152, 24, '#CCC', 'left', false);  // ADJUST: NET stat position & size & color
-        drawPixelText(`MEM:${battle.player.stats.memory}`, panelX + 110, panelY + 152, 24, '#CCC', 'left', false);  // ADJUST: MEM stat position & size & color
+        // Stats: Left column (GPU, CPU, I/O) and Right column (NET, MEM) with uniform spacing
+        const statY = panelY + 180;  // Start after heat bar
+        const statStep = 30;         // Uniform y-step between stats
+
+        drawPixelText(`GPU:${battle.player.stats.compute}`, panelX + 10, statY, 20, '#FFFFFF', 'left', false);
+        drawPixelText(`CPU:${battle.player.stats.logic}`, panelX + 10, statY + statStep, 20, '#FFFFFF', 'left', false);
+        drawPixelText(`I/O:${battle.player.stats.io}`, panelX + 10, statY + statStep * 2, 20, '#FFFFFF', 'left', false);
+
+        drawPixelText(`NET:${battle.player.stats.network}`, panelX + 150, statY, 20, '#FFFFFF', 'left', false);
+        drawPixelText(`MEM:${battle.player.stats.memory}`, panelX + 150, statY + statStep, 20, '#FFFFFF', 'left', false);
+       
+        
     }
 
     // ============================================================================
@@ -605,42 +626,46 @@ function drawStatPanelsWithIcons() {
     // ============================================================================
     const bottomRightBox = gameState.images[ASSETS.uiBoxBottomRight];
     if (bottomRightBox) {
-        const panelW = 300;                                            // ADJUST: Panel width
+        const panelW = 320;                                            // ADJUST: Panel width
         const panelH = 320;                                            // ADJUST: Panel height
         const panelX = canvas.width - panelW - 0;                     // ADJUST: Distance from right edge (-10)
         const panelY = 0;                                             // ADJUST: Distance from top edge
         ctx.drawImage(bottomRightBox, panelX, panelY, panelW, panelH);
 
         // Enemy icon
-        const iconEnemy = gameState.images[ASSETS.iconEnemy];
-        if (iconEnemy) {
-            ctx.drawImage(iconEnemy, panelX + 0, panelY + 50, 32, 32);  // ADJUST: Icon position relative to panel
-        }
+      //  const iconEnemy = gameState.images[ASSETS.iconEnemy];
+     //   if (iconEnemy) {
+      //      ctx.drawImage(iconEnemy, panelX + 0, panelY + 50, 32, 32);  // ADJUST: Icon position relative to panel
+     //   }
 
-        // Enemy name
-        drawPixelText(battle.enemy.name, panelX + 5, panelY + 35, 20, '#000000ff', 'left', true);  // ADJUST: Name position & size & color
+        // Enemy name (title-sized, bold - matches player)
+        drawPixelText(battle.enemy.name, panelX + 0, panelY + 35, 24, '#ffffffff', 'left', true);
 
-        // Hits counter
-        drawPixelText('HITS', panelX + 20, panelY + 110, 20, '#ffffffff', 'left', false);             // ADJUST: Label position & size
-        drawPixelText(`${battle.enemy.hits} / 9`, panelX + 120, panelY + 110, 20, '#fdfdfdff', 'left', true);  // ADJUST: Counter position & size & color
+        // System Integrity (matches player rhythm)
+        drawPixelText('INTEGRITY', panelX + 10, panelY + 80, 20, '#FFFFFF', 'left', false);
+        drawPixelText(`${battle.enemy.integrity}%`, panelX + 230, panelY + 80, 20, '#00b7ffff', 'left', true);
 
-        // Heat bar
-        drawPixelText('HEAT', panelX + 20, panelY + 160, 20, '#ffffffff', 'left', false);             // ADJUST: Heat label position
+        // Heat bar (matches player rhythm)
+        drawPixelText('HEAT', panelX + 10, panelY + 120, 20, '#FFFFFF', 'left', false);
         const heatPercent = Math.min(battle.enemy.heat / battle.enemy.stats.power, 1);
-        const hpBarWidth = 200;                                        // ADJUST: Bar width
-        const hpBarHeight = 20;                                        // ADJUST: Bar height
-        ctx.fillStyle = '#222';                                        // ADJUST: Bar background color
-        ctx.fillRect(panelX + 120, panelY + 140, hpBarWidth, hpBarHeight);
-        const heatColor = heatPercent > 0.8 ? '#FF0000' : heatPercent > 0.5 ? '#FF8C00' : '#0066ffff';  // ADJUST: Heat colors
+        const hpBarWidth = 200;
+        const hpBarHeight = 20;
+        ctx.fillStyle = '#222';
+        ctx.fillRect(panelX + 10, panelY + 130, hpBarWidth, hpBarHeight);
+        const heatColor = heatPercent > 0.8 ? '#FF0000' : heatPercent > 0.5 ? '#FF8C00' : '#FFFF00';
         ctx.fillStyle = heatColor;
-        ctx.fillRect(panelX + 60, panelY + 75, hpBarWidth * heatPercent, hpBarHeight);
+        ctx.fillRect(panelX + 10, panelY + 130, hpBarWidth * heatPercent, hpBarHeight);
 
-        // Stats (no icons for enemy - just text)
-        drawPixelText(`GPU:${battle.enemy.stats.compute}`, panelX + 5, panelY + 300, 20, '#d83dffff', 'left', false);  // ADJUST: GPU stat position & size & color
-        drawPixelText(`CPU:${battle.enemy.stats.logic}`, panelX + 5, panelY + 260, 20, '#d83dffff', 'left', false);    // ADJUST: CPU stat position & size & color
-        drawPixelText(`I/O:${battle.enemy.stats.io}`, panelX + 5, panelY + 220, 20, '#d83dffff', 'left', false);       // ADJUST: I/O stat position & size & color
-        drawPixelText(`NET:${battle.enemy.stats.network}`, panelX + 175, panelY + 220, 20, '#d83dffff', 'left', false); // ADJUST: NET stat position & size & color
-        drawPixelText(`MEM:${battle.enemy.stats.memory}`, panelX + 175, panelY + 260, 20, '#d83dffff', 'left', false);  // ADJUST: MEM stat position & size & color
+        // Stats: Left column (GPU, CPU, I/O) and Right column (NET, MEM) - matches player
+        const statY = panelY + 180;  // Start after heat bar
+        const statStep = 30;         // Uniform y-step between stats
+
+        drawPixelText(`GPU:${battle.enemy.stats.compute}`, panelX + 10, statY, 20, '#FFFFFF', 'left', false);
+        drawPixelText(`CPU:${battle.enemy.stats.logic}`, panelX + 10, statY + statStep, 20, '#FFFFFF', 'left', false);
+        drawPixelText(`I/O:${battle.enemy.stats.io}`, panelX + 10, statY + statStep * 2, 20, '#FFFFFF', 'left', false);
+
+        drawPixelText(`NET:${battle.enemy.stats.network}`, panelX + 150, statY, 20, '#FFFFFF', 'left', false);
+        drawPixelText(`MEM:${battle.enemy.stats.memory}`, panelX + 150, statY + statStep, 20, '#FFFFFF', 'left', false);
     }
 }
 
@@ -683,64 +708,64 @@ function drawCommandInterface() {
     console.log('Drawing command interface');
 
     // ============================================================================
-    // COMMAND INTERFACE PANEL - ANCHORED BOTTOM (FULL WIDTH)
+    // COMMAND INTERFACE PANEL - ANCHORED BOTTOM-RIGHT CORNER
     // ============================================================================
-    const panelHeight = 300;                                           // ADJUST: Panel height
-    const panelY = canvas.height - panelHeight;                        // Anchored to bottom
+    const panelWidth = 280;                                            // ADJUST: Panel width
+    const panelHeight = 300;                                           // ADJUST: Panel height (tall enough for vertical list)
+    const panelX = canvas.width - panelWidth - 10;                     // ADJUST: 10px from right edge
+    const panelY = canvas.height - panelHeight - 10;                   // ADJUST: 10px from bottom edge
 
     // Background panel - Use light UI textbox sprite
-    const commandPanelBox = gameState.images[ASSETS.uiBoxTopLeft];
+    const commandPanelBox = gameState.images[ASSETS.blacTextbox];
     if (commandPanelBox) {
         // Draw the textbox sprite as background (light background)
-      const panelWidth = 400; // adjust as needed
-ctx.drawImage(commandPanelBox, 875, panelY, panelWidth, panelHeight);
-
+        ctx.drawImage(commandPanelBox, panelX, panelY, panelWidth, panelHeight);
     } else {
         // Fallback to light color if sprite not loaded
-        ctx.fillStyle = 'rgba(240, 240, 240, 0.95)';                  // ADJUST: Light panel background color
-        ctx.fillRect(0, panelY, canvas.width, panelHeight);
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.95)';                  // ADJUST: Light panel background color
+        ctx.fillRect(panelX, panelY, panelWidth, panelHeight);
     }
 
     // Border
-   // ctx.strokeStyle = '#4ECDC4';                                       // ADJUST: Panel border color
-   // ctx.lineWidth = 3;                                                 // ADJUST: Border thickness
-    ctx.strokeRect(0, panelY, canvas.width, panelHeight);
+    ctx.strokeStyle = '#00ff2aff';                                       // ADJUST: Panel border color
+    ctx.lineWidth = 3;                                                 // ADJUST: Border thickness
+    ctx.strokeRect(panelX, panelY, panelWidth, panelHeight);
 
-    // Title text - Now dark text on light background
-    drawPixelText('COMMAND INTERFACE', canvas.width / 10, panelY + 50, 10, '#00ff00ff', 'center', true);  // ADJUST: Title position & size & color (dark text)
+    // Title text - centered in panel
+    drawPixelText('COMMANDS', panelX + panelWidth / 2, panelY + 30, 10, '#2bff00ff', 'center', true);
 
     // ============================================================================
-    // COMMAND BUTTONS LAYOUT
+    // COMMAND BUTTONS LAYOUT - VERTICAL LIST (TOP TO BOTTOM)
     // ============================================================================
-    const btnWidth = 200;                                              // ADJUST: Button width
+    const btnWidth = 240;                                              // ADJUST: Button width
     const btnHeight = 40;                                              // ADJUST: Button height
-    const btnSpacing = 5;                                             // ADJUST: Space between buttons
-    const startX = (canvas.width - (btnWidth * 4 + btnSpacing * 3)) / 2;  // Auto-centered
-    const btnY = panelY + 10;                                          // ADJUST: Distance from panel top
+    const btnSpacing = 10;                                             // ADJUST: Vertical space between buttons
+    const btnX = panelX + (panelWidth - btnWidth) / 2;                 // Center buttons in panel
+    const startY = panelY + 90;                                        // ADJUST: Start below title
 
     const commands = [
-        { text: 'EXECUTE', enabled: true, key: 'execute' },            // ADJUST: Button text & enabled state
-        { text: 'TOOL', enabled: false, key: 'tool' },                // ADJUST: Button text & enabled state
-        { text: 'SWAP', enabled: false, key: 'swap' },                // ADJUST: Button text & enabled state
-        { text: 'CONCEDE', enabled: true, key: 'concede' }            // ADJUST: Button text & enabled state
+        { text: 'EXECUTE', enabled: true, key: 'execute' },
+        { text: 'TOOL', enabled: false, key: 'tool' },
+        { text: 'SWAP', enabled: false, key: 'swap' },
+        { text: 'CONCEDE', enabled: true, key: 'concede' }
     ];
 
     gameState.commandButtons = [];
 
     commands.forEach((cmd, i) => {
-        const btnX = startX + (btnWidth + btnSpacing) * i;
+        const btnY = startY + (btnHeight + btnSpacing) * i;            // Stack vertically
 
         // Button background
-        ctx.fillStyle = cmd.enabled ? 'rgba(255, 255, 255, 1)' : 'rgba(0, 0, 0, 0.3)';  // ADJUST: Button fill colors (enabled/disabled)
+        ctx.fillStyle = cmd.enabled ? 'rgba(0, 0, 0, 1)' : 'rgba(200, 200, 200, 0.5)';
         ctx.fillRect(btnX, btnY, btnWidth, btnHeight);
 
         // Button border
-        //ctx.strokeStyle = cmd.enabled ? '#f87373ff' : '#666';            // ADJUST: Button border colors (enabled/disabled)
-       //ctx.lineWidth = 3;                                             // ADJUST: Button border thickness
-        //ctx.strokeRect(btnX, btnY, btnWidth, btnHeight);
+        ctx.strokeStyle = cmd.enabled ? '#15ff00ff' : '#999';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(btnX, btnY, btnWidth, btnHeight);
 
-        // Button text - Dark text on light backgrounds
-        drawPixelText(cmd.text, btnX + btnWidth / 2, btnY + 33, 15, cmd.enabled ? '#2E4057' : '#999', 'center', true);  // ADJUST: Text position & size & colors (dark text)
+        // Button text - centered and vertically balanced
+        drawPixelText(cmd.text, btnX + btnWidth / 2, btnY + btnHeight / 2 + 5, 10, cmd.enabled ? '#00ff15ff' : '#999', 'center', true);
 
         if (cmd.enabled) {
             gameState.commandButtons.push({ key: cmd.key, x: btnX, y: btnY, w: btnWidth, h: btnHeight });
@@ -801,15 +826,16 @@ function drawMoveSelectionSidePanel() {
         ctx.lineWidth = 3;                                             // ADJUST: Move button border thickness
         ctx.strokeRect(btnX, btnY, btnWidth, btnHeight);
 
-        // Move text (left side) - Darker colors for light background
-        drawPixelText(move.name, btnX + 15, btnY + 28, 20, '#ffffffff', 'left', true);              // ADJUST: Move name position & size & color (darker gold)
-        drawPixelText(`[${move.slot}]`, btnX + 15, btnY + 70, 10, '#fbff00ff', 'left', false);          // ADJUST: Slot text position & size & color (darker gray)
-        drawPixelText(move.description, btnX + 15, btnY + 110, 10, '#ffffffff', 'left', false);          // ADJUST: Description position & size & color (darker gray)
+        // Move text (left side) - consistent margins and spacing
+        drawPixelText(move.name, btnX + 15, btnY + 30, 20, '#FFFFFF', 'left', true);
+        drawPixelText(`[${move.slot}]`, btnX + 15, btnY + 60, 10, '#CCCCCC', 'left', false);
+        drawPixelText(move.description, btnX + 15, btnY + 85, 10, '#999999', 'left', false);
 
-        // Move stats (right side) - Darker colors for light background
-        drawPixelText(`DMG:${move.compute}`, btnX + btnWidth - 15, btnY + 35, 15, '#e9ff27ff', 'right', false);           // ADJUST: Damage stat (darker red)
-        drawPixelText(`HEAT:${move.heat > 0 ? '+' : ''}${move.heat}`, btnX + btnWidth - 15, btnY +70, 15, '#e9ff27ff', 'right', false);  // ADJUST: Heat stat (darker orange)
-        drawPixelText(`ACC:${move.accuracy}%`, btnX + btnWidth - 15, btnY + 100, 15, '#e9ff27ff', 'right', false);         // ADJUST: Accuracy stat (darker teal)
+        // Move stats (right side) - single consistent right x-column
+        const rightStatX = btnX + btnWidth - 15;
+        drawPixelText(`DMG:${move.compute}`, rightStatX, btnY + 30, 15, '#CC0000', 'right', false);
+        drawPixelText(`HEAT:${move.heat > 0 ? '+' : ''}${move.heat}`, rightStatX, btnY + 60, 15, '#CC6600', 'right', false);
+        drawPixelText(`ACC:${move.accuracy}%`, rightStatX, btnY + 90, 15, '#008B8B', 'right', false);
 
         gameState.moveButtons.push({ move: move, x: btnX, y: btnY, w: btnWidth, h: btnHeight });
     });
@@ -851,9 +877,9 @@ function drawPostBattleWithAnimations() {
 
     // Determine winner and set appropriate sprites
     let winner;
-    if (battle.player.hits >= 9) {
+    if (battle.enemy.integrity <= 0) {
         winner = 'player';
-    } else if (battle.enemy.hits >= 9) {
+    } else if (battle.player.integrity <= 0) {
         winner = 'enemy';
     } else {
         winner = 'concede';
@@ -946,26 +972,26 @@ function drawPostBattle(winner) {
     // ============================================================================
     // BATTLE SUMMARY SECTION
     // ============================================================================
-    drawPixelText('BATTLE SUMMARY', canvas.width / 2, 375, 27, '#FFD700', 'center', true);  // ADJUST: Title position & size & color
+    drawPixelText('BATTLE SUMMARY', canvas.width / 2, 375, 28, '#FFD700', 'center', true);
 
-    const summaryX = canvas.width / 2 - 300;                           // ADJUST: Summary text X position (offset from center)
-    let summaryY = 310;                                                // ADJUST: Starting Y position for summary items
+    const summaryX = canvas.width / 2 - 300;
+    let summaryY = 420;
 
-    // Rewards list
-    drawPixelText(`Data Packets: ${battle.rewards.dataPackets}`, summaryX, summaryY, 31, '#CCC', 'left', false);  // ADJUST: Data packets line
-    summaryY += 40;                                                    // ADJUST: Line spacing
-    drawPixelText(`XP Gained: ${battle.rewards.xp}`, summaryX, summaryY, 31, '#CCC', 'left', false);              // ADJUST: XP line
-    summaryY += 40;                                                    // ADJUST: Line spacing
-    drawPixelText(`PMP: +${battle.rewards.pmp}`, summaryX, summaryY, 31, '#CCC', 'left', false);                  // ADJUST: PMP line
-    summaryY += 40;                                                    // ADJUST: Line spacing
-    drawPixelText(`Parts: ${battle.rewards.partsGained.length > 0 ? battle.rewards.partsGained.join(', ') : 'None'}`, summaryX, summaryY, 12, '#CCC', 'left', false);  // ADJUST: Parts line
-    summaryY += 60;                                                    // ADJUST: Extra spacing before integrity line
+    // Rewards list - consistent size and spacing
+    drawPixelText(`Data Packets: ${battle.rewards.dataPackets}`, summaryX, summaryY, 20, '#FFFFFF', 'left', false);
+    summaryY += 30;
+    drawPixelText(`XP Gained: ${battle.rewards.xp}`, summaryX, summaryY, 20, '#FFFFFF', 'left', false);
+    summaryY += 30;
+    drawPixelText(`PMP: +${battle.rewards.pmp}`, summaryX, summaryY, 20, '#FFFFFF', 'left', false);
+    summaryY += 30;
+    drawPixelText(`Parts: ${battle.rewards.partsGained.length > 0 ? battle.rewards.partsGained.join(', ') : 'None'}`, summaryX, summaryY, 20, '#FFFFFF', 'left', false);
+    summaryY += 40;
 
     // Integrity status
-    drawPixelText(`Player: ${battle.player.integrity}%  Enemy: ${battle.enemy.integrity}%`, summaryX, summaryY, 24, '#888', 'left', false);  // ADJUST: Integrity line
+    drawPixelText(`Player: ${battle.player.integrity}%  Enemy: ${battle.enemy.integrity}%`, summaryX, summaryY, 20, '#CCCCCC', 'left', false);
 
     // Return prompt - ANCHORED BOTTOM
-    drawPixelText('Click to return to menu', canvas.width / 2, canvas.height - 60, 36, '#4ECDC4', 'center', true);  // ADJUST: Prompt position & size & color
+    drawPixelText('Click to return to menu', canvas.width / 2, canvas.height - 60, 24, '#4ECDC4', 'center', true);
 }
 
 // ============================================================================
@@ -1019,6 +1045,26 @@ function selectMove(move) {
     executeTurn(move);
 }
 
+function endTurn() {
+    const battle = gameState.battle;
+
+    // Clear temporary UI state
+    gameState.selectedMove = null;
+    gameState.uiAnimations.hitMiss = null;
+
+    // Reset temporary buffs
+    if (battle.player.dodgeBoost) {
+        battle.player.dodgeBoost = 0;
+    }
+    if (battle.enemy.dodgeBoost) {
+        battle.enemy.dodgeBoost = 0;
+    }
+
+    // Transition to next turn
+    gameState.scene = 'TURN_SELECT';
+    drawBattle();
+}
+
 function executeTurn(playerMove) {
     const battle = gameState.battle;
     battle.turnCount++;
@@ -1030,17 +1076,16 @@ function executeTurn(playerMove) {
 
     if (firstAttacker === 'player') {
         executePlayerAttack(playerMove, () => {
-            if (battle.player.hits >= 9) {
+            if (battle.enemy.integrity <= 0) {
                 endBattle('player');
             } else {
                 setTimeout(() => {
                     executeEnemyAttack(enemyMove, () => {
-                        if (battle.enemy.hits >= 9) {
+                        if (battle.player.integrity <= 0) {
                             endBattle('enemy');
                         } else {
                             setTimeout(() => {
-                                gameState.scene = 'TURN_SELECT';
-                                drawBattle();
+                                endTurn();
                             }, 1000);
                         }
                     });
@@ -1049,17 +1094,16 @@ function executeTurn(playerMove) {
         });
     } else {
         executeEnemyAttack(enemyMove, () => {
-            if (battle.enemy.hits >= 9) {
+            if (battle.player.integrity <= 0) {
                 endBattle('enemy');
             } else {
                 setTimeout(() => {
                     executePlayerAttack(playerMove, () => {
-                        if (battle.player.hits >= 9) {
+                        if (battle.enemy.integrity <= 0) {
                             endBattle('player');
                         } else {
                             setTimeout(() => {
-                                gameState.scene = 'TURN_SELECT';
-                                drawBattle();
+                                endTurn();
                             }, 1000);
                         }
                     });
@@ -1082,6 +1126,9 @@ function executePlayerAttack(move, callback) {
     setTimeout(() => {
         const result = battle.calculateDamage(battle.player, battle.enemy, move);
 
+        // [HITCHECK] Log attack result for debugging
+        console.log("[HITCHECK] attacker=PLAYER hit=%s dmg=%d crit=%s", result.hit, result.damage, !!result.critical);
+
         // Handle special effects
         if (result.effect === 'OVERCLOCK') {
             battle.addLog(`${battle.player.name} OVERCLOCKED! +30% dodge next turn!`);
@@ -1102,22 +1149,25 @@ function executePlayerAttack(move, callback) {
             battle.playerSprites.tabia = ASSETS.tabia.surprised;
             showHitMissSprite(ASSETS.miss);
         } else {
-            // Regular hit - increment hit counter
-            battle.player.hits++;
-            battle.enemy.integrity -= result.damage;
+            // Regular hit - apply damage to ENEMY and increment PLAYER's score
+            battle.player.hits++;           // Player's score increases (successful hit)
+            battle.enemy.integrity -= result.damage;  // Enemy takes damage
+
+            // [APPLY] Log hit application for debugging
+            console.log("[APPLY] to=ENEMY enemy.integrity=%d player.hits=%d", battle.enemy.integrity, battle.player.hits);
 
             if (result.critical) {
-                battle.addLog(`CRITICAL DATA HIT! ${result.damage} damage! [${battle.player.hits}/9 hits]`);
+                battle.addLog(`CRITICAL DATA HIT! ${result.damage} damage! Enemy integrity: ${battle.enemy.integrity}%`);
                 showHitMissSprite(ASSETS.directHitLanded);
             } else {
-                battle.addLog(`Hit! ${result.damage} damage dealt. [${battle.player.hits}/9 hits]`);
+                battle.addLog(`Hit! ${result.damage} damage dealt. Enemy integrity: ${battle.enemy.integrity}%`);
             }
             playSound('hit');
             battle.playerSprites.tabia = ASSETS.tabia.jumpPoint;
             battle.enemySprite = ASSETS.enemy.hit;
 
-            if (battle.player.hits >= 9) {
-                battle.addLog(`${battle.player.name} WINS WITH 9 HITS!`);
+            if (battle.enemy.integrity <= 0) {
+                battle.addLog(`${battle.enemy.name} SYSTEM INTEGRITY COMPROMISED!`);
             }
         }
 
@@ -1143,27 +1193,33 @@ function executeEnemyAttack(move, callback) {
     setTimeout(() => {
         const result = battle.calculateDamage(battle.enemy, battle.player, move);
 
+        // [HITCHECK] Log attack result for debugging
+        console.log("[HITCHECK] attacker=ENEMY hit=%s dmg=%d crit=%s", result.hit, result.damage, !!result.critical);
+
         if (!result.hit) {
             battle.addLog('Enemy missed!');
             playSound('miss');
             battle.playerSprites.tabia = ASSETS.tabia.surprised;
             showHitMissSprite(ASSETS.miss);
         } else {
-            // Enemy hit - increment enemy hit counter
-            battle.enemy.hits++;
-            battle.player.integrity -= result.damage;
+            // Enemy hit - increment ENEMY's score and apply damage to PLAYER
+            battle.enemy.hits++;              // Enemy's score increases (successful hit)
+            battle.player.integrity -= result.damage;  // Player takes damage
+
+            // [APPLY] Log hit application for debugging
+            console.log("[APPLY] to=PLAYER player.integrity=%d enemy.hits=%d", battle.player.integrity, battle.enemy.hits);
 
             if (result.critical) {
-                battle.addLog(`ENEMY CRITICAL HIT! ${result.damage} damage! [${battle.enemy.hits}/9 hits]`);
+                battle.addLog(`ENEMY CRITICAL HIT! ${result.damage} damage! Player integrity: ${battle.player.integrity}%`);
                 showHitMissSprite(ASSETS.directHitReceived);
             } else {
-                battle.addLog(`Enemy hit! ${result.damage} damage received. [${battle.enemy.hits}/9 hits]`);
+                battle.addLog(`Enemy hit! ${result.damage} damage received. Player integrity: ${battle.player.integrity}%`);
             }
             playSound('hit');
             battle.playerSprites.tabia = ASSETS.tabia.surprised;
 
-            if (battle.enemy.hits >= 9) {
-                battle.addLog(`${battle.enemy.name} WINS WITH 9 HITS!`);
+            if (battle.player.integrity <= 0) {
+                battle.addLog(`${battle.player.name} SYSTEM INTEGRITY COMPROMISED!`);
             }
         }
 
